@@ -1,0 +1,29 @@
+.container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+}
+
+.container-wrapper {
+    position: relative;
+    width: 70%;
+    height: 70vh;
+    margin: 0 auto;
+}
+
+.mouse {
+    transform: translate(-4px, 0);
+
+    filter: drop-shadow(3px 5px 2px rgb(0 0 0 / 0.4));
+    position: absolute;
+    z-index: 3;
+}
+
+.octicon {
+    position: absolute;
+    left: 20px;
+    bottom: 20px;
+    color: #45555d;
+    text-shadow: 0 0 5px black;
+}

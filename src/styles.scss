@@ -1,1 +1,89 @@
-/* You can add global styles to this file, and also import other style files */
+// @import "~prismjs/themes/prism-okaidia";
+@import "~prismjs/themes/prism-tomorrow";
+
+// @import "~prismjs/themes/prism-solarizedlight";
+// @import "~prismjs/themes/prism";
+
+@import '~codemirror/lib/codemirror';
+@import '~codemirror/theme/material';
+*,
+*::after,
+*::before {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+::-webkit-scrollbar{
+    z-index: 3;
+    cursor: pointer;
+    height: 4px;
+    width: 5px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #888; 
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555; 
+}
+
+::-webkit-scrollbar-thumb:vertical{
+    background: #393942;
+    border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:horizontal{
+    background: #393942;
+    border-radius: 10px;
+}
+
+
+html,
+body {
+    font-family: sans-serif;
+    height: 100%;
+    background-color: #3f3f3f;
+}
+
+pre[class*="language-"].line-numbers {
+    position: relative;
+    counter-reset: linenumber;
+}
+
+pre[class*="language-"].line-numbers>code {
+    position: relative;
+    white-space: inherit;
+}
+
+.line-numbers .line-numbers-rows {
+    position: absolute;
+    pointer-events: none;
+    top: -1px;
+    font-size: 100%;
+    left: -3.8em;
+    width: 3em;
+    /* works for line-numbers below 1000 lines */
+    letter-spacing: -1px;
+    border-right: 1px solid #999;
+
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+
+}
+
+.line-numbers-rows>span {
+    display: block;
+    counter-increment: linenumber;
+}
+
+.line-numbers-rows>span:before {
+    content: counter(linenumber);
+    color: #999;
+    display: block;
+    padding-right: 0.8em;
+    text-align: right;
+}

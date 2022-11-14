@@ -1,0 +1,14 @@
+<div #terminal class="terminal">
+  <form [formGroup]="form">
+    <ngx-codemirror
+      #codemirror
+      formControlName="content"
+      [options]="options"
+      (click)="onCursorChange(codemirror.codeMirror)"
+      ></ngx-codemirror>
+      <ng-content>
+        
+      </ng-content>
+  </form>
+  
+</div>

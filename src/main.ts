@@ -1,8 +1,13 @@
+
 import { enableProdMode } from '@angular/core';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 
 import { AppModule } from './app/app.module';
 import { environment } from './environments/environment';
+import 'codemirror/mode/sass/sass';
+import 'codemirror/mode/yaml/yaml';
+import 'codemirror/mode/htmlmixed/htmlmixed';
+import 'codemirror/mode/markdown/markdown';
 
 if (environment.production) {
   enableProdMode();
