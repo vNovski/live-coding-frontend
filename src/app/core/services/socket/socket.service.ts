@@ -5,12 +5,12 @@ import { environment } from 'src/environments/environment';
 
 
 export enum CommunicationEventTypes {
-  userConnect = 'user-connect',
   terminalChange = 'terminal-code-change',
   terminalMouseMove = 'terminal-mousemove',
   terminalCursorChange = 'terminal-cursor-change',
   terminalSelectionChange = 'terminal-selection-change',
-  connect = 'connect'
+  connect = 'client-connect',
+  disconnect = 'client-disconnect',
 }
 
 @Injectable({
@@ -34,6 +34,9 @@ export class SocketService {
   }
 
   private monitorConnectionStatus() {
+    this.socket.on('connect', () => {
+      this._available$.next(true);
+    })
     this.socket.on('connect', () => {
       this._available$.next(true);
     })

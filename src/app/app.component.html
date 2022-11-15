@@ -1,4 +1,7 @@
 <div class="container">
+  <button class="settings-btn" mat-icon-button>
+    <mat-icon>settings</mat-icon>
+  </button>
   <div class="container-wrapper">
     <app-terminal
       [code]="code"
@@ -8,8 +11,7 @@
       (mouseMove)="mouseMove($event)"
       (mouseLeave)="mouseMove($event)"
       (cursorChange)="cursorChange($event)"
-      (selectionChange)="selectionChange($event)"
-      ></app-terminal>
+      (selectionChange)="selectionChange($event)"></app-terminal>
     <ng-container *ngFor="let mouse of otherMouses">
       <svg *ngIf="mouse.y && mouse.x" class="mouse" [ngStyle]="{'top.px':
         mouse.y,
@@ -23,5 +25,5 @@
       </ng-container>
     </div>
 
-    <span class="octicon">© 2022 Vlad N.</span>
+    <span class="octicon">© {{year}} Vlad N.</span>
   </div>

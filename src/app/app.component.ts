@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { Position } from 'codemirror';
 import { Socket } from 'ngx-socket-io';
 import { ConnectionsService } from './core/services/connections/connections.service';
@@ -11,7 +12,7 @@ import { UserService } from './core/services/user/user.service';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  title = 'live-cooding';
+  year = new Date().getFullYear();
   code = '';
   otherMouses: any = [];
   otherCursors: any = [];
@@ -21,8 +22,25 @@ export class AppComponent {
   constructor(
     public readonly connectionService: ConnectionsService,
     public socketService: SocketService,
-    private readonly userService: UserService
+    private readonly userService: UserService,
+    private readonly snackBar: MatSnackBar
   ) {
+    this.connectionService.connect$.subscribe(() => {
+      console.log('connected')
+      this.snackBar.open('User connected', '', {
+        verticalPosition: 'bottom',
+        horizontalPosition: 'right',
+        panelClass: 'snackbar'
+      })
+    })
+    this.connectionService.disconnect$.subscribe(() => {
+      console.log('disconnect')
+      this.snackBar.open('User disconnect', '', {
+        verticalPosition: 'bottom',
+        horizontalPosition: 'right',
+        panelClass: 'snackbar'
+      })
+    })
     this.connectionService.connections$.subscribe(connections => {
       this.otherMouses = connections.map((id) => ({ x: null, y: null, color: null, userId: id }));
     });
