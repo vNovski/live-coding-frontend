@@ -40,12 +40,15 @@
     border-radius: 10px;
 }
 
+.icon-button {
+    color: #546E7A;
+    border-radius: 12px!important;
+}
 
 html,
 body {
     font-family: sans-serif;
     height: 100%;
-    background-color: #3f3f3f;
 }
 
 pre[class*="language-"].line-numbers {
@@ -58,36 +61,6 @@ pre[class*="language-"].line-numbers>code {
     white-space: inherit;
 }
 
-.line-numbers .line-numbers-rows {
-    position: absolute;
-    pointer-events: none;
-    top: -1px;
-    font-size: 100%;
-    left: -3.8em;
-    width: 3em;
-    /* works for line-numbers below 1000 lines */
-    letter-spacing: -1px;
-    border-right: 1px solid #999;
-
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-
-}
-
-.line-numbers-rows>span {
-    display: block;
-    counter-increment: linenumber;
-}
-
-.line-numbers-rows>span:before {
-    content: counter(linenumber);
-    color: #999;
-    display: block;
-    padding-right: 0.8em;
-    text-align: right;
-}
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 

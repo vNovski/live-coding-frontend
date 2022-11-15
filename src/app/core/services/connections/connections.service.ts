@@ -11,14 +11,22 @@ export class ConnectionsService {
 
   public connect$ = this.socketService.on(CommunicationEventTypes.connect);
   public disconnect$ = this.socketService.on(CommunicationEventTypes.disconnect);
+  public initialConnections$ = this.socketService.on(CommunicationEventTypes.shareConnections);
 
   get connections$(): Observable<string[]> {
     return this._connections$.asObservable();
   }
 
   constructor(private readonly socketService: SocketService) {
+    this.init();
     this.listenForConnect();
     this.listenForDisconnect();
+  }
+
+  private init(): void {
+    this.initialConnections$.subscribe((userIds) => {
+      this._connections$.next(userIds);
+    })
   }
 
   private listenForConnect(): void {

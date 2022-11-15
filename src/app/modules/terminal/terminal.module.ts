@@ -4,6 +4,7 @@ import { TerminalComponent } from './terminal.component';
 import { HighlightService } from './services/highlight.service';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CodemirrorModule } from '@ctrl/ngx-codemirror';
+import { MaterialModule } from 'src/app/material.module';
 
 @NgModule({
   declarations: [
@@ -13,7 +14,8 @@ import { CodemirrorModule } from '@ctrl/ngx-codemirror';
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-    CodemirrorModule
+    CodemirrorModule,
+    MaterialModule
   ],
   providers: [HighlightService],
   exports: [TerminalComponent]

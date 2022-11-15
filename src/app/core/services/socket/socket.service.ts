@@ -11,6 +11,7 @@ export enum CommunicationEventTypes {
   terminalSelectionChange = 'terminal-selection-change',
   connect = 'client-connect',
   disconnect = 'client-disconnect',
+  shareConnections = 'share-connections',
 }
 
 @Injectable({
