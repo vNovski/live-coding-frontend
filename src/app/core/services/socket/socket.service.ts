@@ -12,6 +12,8 @@ export enum CommunicationEventTypes {
   connect = 'client-connect',
   disconnect = 'client-disconnect',
   shareConnections = 'share-connections',
+  joinRoom = 'join-room',
+  leaveRoom = 'leave-room',
 }
 
 @Injectable({
@@ -55,4 +57,5 @@ export class SocketService {
       this.socket.on(event, data => observer.next(data));
     })
   }
+
 }

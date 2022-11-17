@@ -1,0 +1,60 @@
+.button-container {
+    position: absolute;
+    display: grid;
+    place-items: center;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+h1 {
+    color: #4e4e53e9;
+    padding: 0;
+    margin: 0;
+    font-size: 30px;
+    margin-bottom: 5px;
+}
+
+h1, p {
+    color: #4e4e53e9;
+    font-weight: bold;
+    text-shadow: 0px 1px 4px #151516e9;
+    background-clip: text;
+  }
+
+p {
+    margin-bottom: 30px;
+    text-shadow: n;
+}
+
+
+.create-room-button {
+    display: flex;
+    align-items: center;
+    font-weight: 500;
+    background: #17171C;
+    white-space: nowrap;
+    border-radius: 12px;
+    text-align: center;
+    text-transform: uppercase;
+    color: #4e4e53e9;
+    box-shadow: 0 0 10px 0 #00000091;
+
+    letter-spacing: 2px;
+    font-size: 14px;
+    padding: 0;
+
+
+    &_label {
+        padding: 10px 20px;
+    }
+
+    &_icon {
+        border-top-right-radius: 12px;
+        border-bottom-right-radius: 12px;
+        padding: 10px;
+        background: #121216;
+        height: 100%;
+        width: 50px;
+    }
+}

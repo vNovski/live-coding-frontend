@@ -15,7 +15,7 @@ import { MaterialModule } from 'src/app/material.module';
     FormsModule,
     ReactiveFormsModule,
     CodemirrorModule,
-    MaterialModule
+    MaterialModule,
   ],
   providers: [HighlightService],
   exports: [TerminalComponent]
