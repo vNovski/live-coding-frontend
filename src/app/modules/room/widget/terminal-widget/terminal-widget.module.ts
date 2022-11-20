@@ -1,14 +1,14 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { TerminalComponent } from './terminal.component';
-import { HighlightService } from './services/highlight.service';
+import { TerminalWidgetComponent } from './terminal-widget.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CodemirrorModule } from '@ctrl/ngx-codemirror';
 import { MaterialModule } from 'src/app/material.module';
+import { SharedModule } from 'src/app/shared/shared.module';
 
 @NgModule({
   declarations: [
-    TerminalComponent
+    TerminalWidgetComponent
   ],
   imports: [
     CommonModule,
@@ -16,8 +16,9 @@ import { MaterialModule } from 'src/app/material.module';
     ReactiveFormsModule,
     CodemirrorModule,
     MaterialModule,
+    SharedModule
   ],
-  providers: [HighlightService],
-  exports: [TerminalComponent]
+  providers: [],
+  exports: [TerminalWidgetComponent]
 })
-export class TerminalModule { }
+export class TerminalWidgetModule { }

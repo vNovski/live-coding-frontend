@@ -1,0 +1,15 @@
+<div class="terminal-widget" [class.fullscreen]="fullscreenStatus">
+  <button (click)="toggleFullscreen()" class="fullscreen-btn icon-button" mat-icon-button>
+    <mat-icon>fullscreen</mat-icon>
+  </button>
+  <app-terminal
+    #terminal
+    [code]="terminalWidgetService.otherChanged$ | async"
+    (changed)="terminalChanged($event)"
+    (cursorChange)="cursorChange($event)"
+    (selectionChange)="selectionChange($event)"
+    (mouseMove)="mouseMove($event)"
+    (mouseLeave)="mouseMove($event)"
+    (executionLog)="executionLog($event)"
+    ></app-terminal>
+</div>

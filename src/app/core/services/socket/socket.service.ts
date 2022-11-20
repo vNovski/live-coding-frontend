@@ -11,7 +11,7 @@ export enum CommunicationEventTypes {
   terminalSelectionChange = 'terminal-selection-change',
   connect = 'client-connect',
   disconnect = 'client-disconnect',
-  shareConnections = 'share-connections',
+  shareConnections = 'room:share-connections',
   joinRoom = 'join-room',
   leaveRoom = 'leave-room',
 }
@@ -40,9 +40,6 @@ export class SocketService {
     this.socket.on('connect', () => {
       this._available$.next(true);
     })
-    this.socket.on('connect', () => {
-      this._available$.next(true);
-    })
 
     this.socket.on('disconnect', () => {
       this._available$.next(false);
@@ -52,9 +49,9 @@ export class SocketService {
   emit(event: string, data: any) {
     this.socket.emit(event, data);
   }
-  on(event: CommunicationEventTypes): Observable<any> {
+  on(event: any): Observable<any> {
     return new Observable(observer => {
-      this.socket.on(event, data => observer.next(data));
+      this.socket.on(event, (data: any) => observer.next(data));
     })
   }
 

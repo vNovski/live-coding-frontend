@@ -3,15 +3,7 @@
     <mat-icon>exit_to_app</mat-icon>
   </button>
   <div class="container-wrapper">
-    <app-terminal
-      [code]="code"
-      [otherCursors]="otherCursors"
-      [otherSelections]="otherSelections"
-      (changed)="terminalChanged($event)"
-      (mouseMove)="mouseMove($event)"
-      (mouseLeave)="mouseMove($event)"
-      (cursorChange)="cursorChange($event)"
-      (selectionChange)="selectionChange($event)"></app-terminal>
+      <app-terminal-widget></app-terminal-widget>
     <ng-container *ngFor="let mouse of otherMouses">
       <svg *ngIf="mouse.y && mouse.x" class="mouse" [ngStyle]="{'top.px':
         mouse.y,

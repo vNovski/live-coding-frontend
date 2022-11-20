@@ -1,0 +1,57 @@
+@import "../../../../../theme/index.scss";
+
+::ng-deep .other-cursor {
+  position: absolute;
+  z-index: 0;
+  padding: 0;
+  border-left-width: 2px;
+  border-left-style: solid;
+  animation: pulsate 1s steps(1) infinite;
+}
+
+.terminal-widget {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  margin: 0 auto;
+  transition: none;
+  transition: all 0.5s ease-in-out;
+
+  @include for-phone-only {
+    height: 100vh;
+    width: 100%;
+  }
+
+  @include for-tablet-portrait-up {
+    height: 90vh;
+    width: 90%;
+  }
+
+  @include for-desktop-up {
+    width: 70%;
+    height: 70vh;
+  }
+
+  &.fullscreen {
+    transition: all 0.5s ease-in-out;
+
+    max-width: none;
+    max-height: none;
+    width: 100%;
+    height: 100vh;
+  }
+
+  .fullscreen-btn {
+    z-index: 3;
+    transition: all 0.5s ease-in-out;
+    position: absolute;
+    bottom: 0.5rem;
+    right: 0.5rem;
+    background: #263238;
+
+    .mat-icon {
+      filter: drop-shadow(0 0 2px black);
+    }
+  }
+}

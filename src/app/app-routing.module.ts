@@ -8,7 +8,7 @@ const routes: Routes = [
   },
   {
     path: 'room/:id',
-    loadChildren: (): any => import('./modules/editor-page/editor-page.module').then((m) => m.EditorPageModule),
+    loadChildren: (): any => import('./modules/room/room.module').then((m) => m.RoomModule),
   },
 ];
 

@@ -1,7 +1,13 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, map, Observable, switchMap, tap } from 'rxjs';
-import { CommunicationEventTypes, SocketService } from '../socket/socket.service';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { SocketService } from '../socket/socket.service';
 
+
+export enum RoomEvents {
+  join = 'room:join',
+  leave = 'room:leave',
+  shareConnections = 'room:share-connections',
+}
 
 @Injectable({
   providedIn: 'root'
@@ -9,9 +15,9 @@ import { CommunicationEventTypes, SocketService } from '../socket/socket.service
 export class ConnectionsService {
   public _connections$: BehaviorSubject<string[]> = new BehaviorSubject<string[]>([]);
 
-  public connect$ = this.socketService.on(CommunicationEventTypes.connect);
-  public disconnect$ = this.socketService.on(CommunicationEventTypes.disconnect);
-  public initialConnections$ = this.socketService.on(CommunicationEventTypes.shareConnections);
+  public connect$ = this.socketService.on(RoomEvents.join);
+  public disconnect$ = this.socketService.on(RoomEvents.leave);
+  public initialConnections$ = this.socketService.on(RoomEvents.shareConnections);
 
   get connections$(): Observable<string[]> {
     return this._connections$.asObservable();
