@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Input, OnDestroy, OnInit, SkipSelf, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, SkipSelf, ViewChild } from '@angular/core';
 import { Subject, takeUntil } from 'rxjs';
 import { SocketService } from 'src/app/core/services/socket/socket.service';
 import addAlpha from 'src/app/core/utils/addAlpha';
@@ -22,6 +22,8 @@ export class TerminalWidgetComponent implements OnInit, AfterViewInit, OnDestroy
   @ViewChild('terminal', { static: true }) terminal!: TerminalComponent;
   @Input('code') code: string = '';
 
+  @Output() fullscreenChange = new EventEmitter<boolean>();
+
   options = {
     lineNumbers: true,
     theme: 'material',
@@ -30,6 +32,7 @@ export class TerminalWidgetComponent implements OnInit, AfterViewInit, OnDestroy
 
   otherCursors: any = [];
   fullscreenStatus = false;
+  otherMouses: any = [];
 
   private selectionMarkers: Map<string, any> = new Map();
   private cursorMarkers: Map<string, any> = new Map();
@@ -38,7 +41,9 @@ export class TerminalWidgetComponent implements OnInit, AfterViewInit, OnDestroy
   constructor(
     @SkipSelf() readonly roomService: RoomService,
     public readonly terminalWidgetService: TerminalWidgetService,
-    private readonly logService: LogService
+    private readonly logService: LogService,
+    private readonly socketService: SocketService,
+    private readonly cdRef: ChangeDetectorRef
   ) { }
 
   ngOnInit(): void {
@@ -53,6 +58,16 @@ export class TerminalWidgetComponent implements OnInit, AfterViewInit, OnDestroy
     this.terminalWidgetService.executionLog$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((log: TerminalLog) => {
       this.log(log);
     });
+
+    this.roomService.connections$.pipe(takeUntil(this.ngUnsubscribe)).subscribe(connections => {
+      this.otherMouses = connections.map((id) => ({ x: null, y: null, color: null, userId: id }));
+    });
+
+    // TODO: избавиться от socket service
+    this.socketService.on(TermianlEvents.mouseMove).pipe(takeUntil(this.ngUnsubscribe)).subscribe((receivedMouse) => {
+      this.otherMouses = this.otherMouses.map((mouse: any) => mouse.userId === receivedMouse.userId ? { ...receivedMouse } : mouse);
+      this.cdRef.markForCheck();
+    });
   }
 
   ngAfterViewInit(): void {
@@ -60,12 +75,16 @@ export class TerminalWidgetComponent implements OnInit, AfterViewInit, OnDestroy
 
   toggleFullscreen(): void {
     this.fullscreenStatus = !this.fullscreenStatus;
+    this.fullscreenChange.emit(this.fullscreenStatus);
   }
 
   terminalChanged(code: string): void {
     this.roomService.terminalChanged(code);
   }
 
+  execute(): void {
+    this.terminal.execute();
+  }
 
   cursorChange(position: any): void {
     this.roomService.cursorChange(position);
@@ -83,7 +102,7 @@ export class TerminalWidgetComponent implements OnInit, AfterViewInit, OnDestroy
   executionLog(log: TerminalLog): void {
     this.terminalWidgetService.shareExecutionLog(this.roomService.id, log);
     this.log(log);
-   
+
   }
 
   private log(log: TerminalLog): void {

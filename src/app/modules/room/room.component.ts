@@ -27,11 +27,12 @@ function roomServiceFactory(route: ActivatedRoute, userService: UserService, soc
 })
 export class RoomComponent implements OnInit, OnDestroy {
   code = '';
-  otherMouses: any = [];
+ 
   otherCursors: any = [];
   otherSelections: any = [];
   communicationEventTypes = CommunicationEventTypes;
   roomId: string | null = null;
+  hideLeaveBtn = false;
 
   private ngUnsubscribe: Subject<void> = new Subject<void>();
 
@@ -49,14 +50,10 @@ export class RoomComponent implements OnInit, OnDestroy {
       this.roomId = id;
       this.socketService.emit(RoomEvents.join, id);
     });
+  }
 
-    this.roomService.connections$.pipe(takeUntil(this.ngUnsubscribe)).subscribe(connections => {
-      this.otherMouses = connections.map((id) => ({ x: null, y: null, color: null, userId: id }));
-    });
-
-    this.socketService.on(TermianlEvents.mouseMove).pipe(takeUntil(this.ngUnsubscribe)).subscribe((receivedMouse) => {
-      this.otherMouses = this.otherMouses.map((mouse: any) => mouse.userId === receivedMouse.userId ? receivedMouse : mouse);
-    });
+  fullscreenChange(status: boolean): void {
+    this.hideLeaveBtn = status;
   }
 
   leaveRoom(): void {

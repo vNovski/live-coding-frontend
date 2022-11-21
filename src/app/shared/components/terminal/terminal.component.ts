@@ -1,6 +1,7 @@
-import { ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, SkipSelf, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, SkipSelf, ViewChild } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { CodemirrorComponent } from '@ctrl/ngx-codemirror';
+import { rejects } from 'assert';
 import { Editor, EditorFromTextArea } from 'codemirror';
 import { Subject, fromEvent, switchMap, map, takeUntil, debounceTime, throttleTime } from 'rxjs';
 import addAlpha from 'src/app/core/utils/addAlpha';
@@ -15,8 +16,9 @@ import { TerminalService } from './services/terminal.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [TerminalService]
 })
-export class TerminalComponent implements OnInit, OnDestroy {
+export class TerminalComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild('terminal', { static: true }) terminal!: ElementRef;
+  @ViewChild('terminalHeader', { static: true }) terminalHeader!: ElementRef;
   @ViewChild('codemirror', { static: true }) codemirror!: CodemirrorComponent;
 
   @Input('options') options = {
@@ -38,6 +40,8 @@ export class TerminalComponent implements OnInit, OnDestroy {
   @Output() selectionChange = new EventEmitter<any>();
   @Output() executionLog = new EventEmitter<TerminalLog>();
 
+
+  fullscreenStatus = false;
 
   form = this.fb.group({
     content: ''
@@ -61,9 +65,12 @@ export class TerminalComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.listenForm();
-    this.listenMouseMove();
     this.listenSelection();
 
+  }
+
+  ngAfterViewInit(): void {
+    this.listenMouseMove();
   }
 
   ngOnDestroy() {
@@ -121,9 +128,10 @@ export class TerminalComponent implements OnInit, OnDestroy {
       this.mouseLeave.emit({ x: null, y: null });
     })
     fromEvent<MouseEvent>(terminal, 'mousemove').pipe(takeUntil(this.ngUnsubscribe)).pipe(throttleTime(10)).subscribe(({ clientX, clientY }) => {
-      var rect = terminal.getBoundingClientRect();
-      var x = clientX - rect.left;
-      var y = clientY - rect.top;
+      const rect = terminal.getBoundingClientRect();
+      const editorRect = this.terminal.nativeElement.querySelector('.CodeMirror-scroll');
+      const x = (clientX - rect.left) + editorRect.scrollLeft;
+      const y = (clientY - rect.top) + editorRect.scrollTop;
       this.mouseMove.emit({ x, y });
     })
   };

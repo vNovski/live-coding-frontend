@@ -1,20 +1,13 @@
 <div #terminal class="terminal">
-    <button class="settings-btn icon-button" mat-icon-button>
-      <mat-icon>settings</mat-icon>
-    </button>
-    <button (click)="execute()" class="execute-btn icon-button" mat-icon-button>
-      <mat-icon>play_arrow</mat-icon>
-    </button>
-    <form [formGroup]="form">
-      <ngx-codemirror
-        #codemirror
-        formControlName="content"
-        [options]="options"
-        (click)="onCursorChange(codemirror.codeMirror)"
-        ></ngx-codemirror>
-        <ng-content>
-          
-        </ng-content>
-    </form>    
-  </div>
-  
+  <form [formGroup]="form">
+    <ngx-codemirror
+      #codemirror
+      formControlName="content"
+      [options]="options"
+      (click)="onCursorChange(codemirror.codeMirror)"></ngx-codemirror>
+    <ng-content>
+
+    </ng-content>
+  </form>
+  <ng-content></ng-content>
+</div>

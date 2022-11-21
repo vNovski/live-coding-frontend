@@ -9,6 +9,13 @@
   animation: pulsate 1s steps(1) infinite;
 }
 
+.mouse {
+  transform: translate(-4px, 0);
+  filter: drop-shadow(3px 5px 2px rgb(0 0 0 / 0.4));
+  position: absolute;
+  z-index: 3;
+}
+
 .terminal-widget {
   position: absolute;
   left: 50%;
@@ -16,7 +23,74 @@
   transform: translate(-50%, -50%);
   margin: 0 auto;
   transition: none;
-  transition: all 0.5s ease-in-out;
+  transition: $default-transition;
+  background: transparent;
+
+  border-collapse: collapse;
+
+  &-header {
+    width: 100%;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    background: $background;
+
+    .controls {
+      z-index: 5;
+      transition: $default-transition;
+    }
+
+    button {
+      transition: all 0.2s ease-in-out;
+      box-shadow: 0 0 5px 0 #00000091;
+      background: #263238;
+
+      &:not(:last-of-type) {
+        margin-right: 10px;
+      } 
+
+      &:hover {
+        box-shadow: $default-shadow;
+        filter: brightness(1.1);
+      }
+
+      &:active {
+        box-shadow: inset $default-shadow;
+      }
+
+      &.execute-btn {
+        .mat-icon {
+          transition: all 0.2s ease-in-out;
+          line-height: 30px;
+          width: 30px;
+          height: 30px;
+          font-size: 30px;
+          color: rgb(48, 107, 57);
+        }
+
+      }
+
+      &.settings-btn {
+        transition: $default-transition;
+
+        mat-icon {
+          transition: $default-transition;
+        }
+
+        &:hover {
+          mat-icon {
+            transform: rotate(180deg) !important;
+          }
+        }
+
+        &:active {
+          box-shadow: inset $default-shadow;
+          filter: brightness(1);
+        }
+      }
+    }
+  }
 
   @include for-phone-only {
     height: 100vh;
@@ -34,24 +108,20 @@
   }
 
   &.fullscreen {
-    transition: all 0.5s ease-in-out;
-
+    transition: $default-transition;
     max-width: none;
     max-height: none;
     width: 100%;
     height: 100vh;
-  }
 
-  .fullscreen-btn {
-    z-index: 3;
-    transition: all 0.5s ease-in-out;
-    position: absolute;
-    bottom: 0.5rem;
-    right: 0.5rem;
-    background: #263238;
+    ::ng-deep .terminal {
+      box-shadow: 0 0 0 transparent;
+    }
 
-    .mat-icon {
-      filter: drop-shadow(0 0 2px black);
+    .terminal-widget-header {
+      .controls {
+        margin-right: 20px;
+      }
     }
   }
 }
