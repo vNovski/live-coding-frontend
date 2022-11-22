@@ -1,11 +1,8 @@
-import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, SkipSelf, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { CodemirrorComponent } from '@ctrl/ngx-codemirror';
-import { rejects } from 'assert';
 import { Editor, EditorFromTextArea } from 'codemirror';
-import { Subject, fromEvent, switchMap, map, takeUntil, debounceTime, throttleTime } from 'rxjs';
-import addAlpha from 'src/app/core/utils/addAlpha';
-import { RoomService } from 'src/app/modules/room/room.service';
+import { debounceTime, fromEvent, map, Subject, switchMap, takeUntil, throttleTime } from 'rxjs';
 import { TerminalLog } from './interfaces/terminal-log.interface';
 import { TerminalService } from './services/terminal.service';
 
@@ -29,7 +26,9 @@ export class TerminalComponent implements OnInit, OnDestroy, AfterViewInit {
 
   @Input('code') set code(code: string | null) {
     if (code !== null) {
+      const cursorPos = this.editor.getCursor();
       this.contentControl?.patchValue(code, { emitEvent: false });
+      this.editor.setCursor(cursorPos);
     }
   };
 
@@ -44,7 +43,7 @@ export class TerminalComponent implements OnInit, OnDestroy, AfterViewInit {
   fullscreenStatus = false;
 
   form = this.fb.group({
-    content: ''
+    content: ``
   });
 
 
