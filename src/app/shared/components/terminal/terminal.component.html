@@ -4,7 +4,8 @@
       #codemirror
       formControlName="content"
       [options]="options"
-      (click)="onCursorChange(codemirror.codeMirror)"></ngx-codemirror>
+      (scroll)="onScrollChange($event)"
+      (cursorActivity)="onCursorChange()"></ngx-codemirror>
     <ng-content>
 
     </ng-content>

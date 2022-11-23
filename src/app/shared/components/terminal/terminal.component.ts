@@ -1,8 +1,8 @@
-import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import { AfterContentInit, AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, Renderer2, ViewChild } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { CodemirrorComponent } from '@ctrl/ngx-codemirror';
-import { Editor, EditorFromTextArea } from 'codemirror';
-import { debounceTime, fromEvent, map, Subject, switchMap, takeUntil, throttleTime } from 'rxjs';
+import { Editor, EditorFromTextArea, Position } from 'codemirror';
+import { BehaviorSubject, combineLatest, debounceTime, fromEvent, map, Subject, switchMap, takeUntil, throttleTime } from 'rxjs';
 import { TerminalLog } from './interfaces/terminal-log.interface';
 import { TerminalService } from './services/terminal.service';
 
@@ -26,9 +26,16 @@ export class TerminalComponent implements OnInit, OnDestroy, AfterViewInit {
 
   @Input('code') set code(code: string | null) {
     if (code !== null) {
-      const cursorPos = this.editor.getCursor();
+      const cursorPos = this.editor?.getCursor();
+      const scrollPos = this.editor?.getScrollInfo();
       this.contentControl?.patchValue(code, { emitEvent: false });
-      this.editor.setCursor(cursorPos);
+
+      if (scrollPos) {
+        this.editor.scrollTo(scrollPos.left, scrollPos.top);
+      }
+      if (cursorPos) {
+        this.editor.setCursor(cursorPos);
+      }
     }
   };
 
@@ -55,17 +62,17 @@ export class TerminalComponent implements OnInit, OnDestroy, AfterViewInit {
     return this.form.get('content');
   }
 
+  private scroll$: BehaviorSubject<{ left: number, top: number }> = new BehaviorSubject<{ left: number, top: number }>({ left: 0, top: 0 });
   private ngUnsubscribe: Subject<void> = new Subject<void>();
 
   constructor(
     private readonly terminalService: TerminalService,
-    private readonly fb: FormBuilder
+    private readonly fb: FormBuilder,
+    private renderer: Renderer2
   ) { }
 
   ngOnInit(): void {
     this.listenForm();
-    this.listenSelection();
-
   }
 
   ngAfterViewInit(): void {
@@ -77,13 +84,10 @@ export class TerminalComponent implements OnInit, OnDestroy, AfterViewInit {
     this.ngUnsubscribe.complete();
   }
 
-  onCursorChange(mirror: Editor | undefined): void {
-    if (!mirror) {
-      return;
-    }
-    const from = mirror.getCursor('from');
-    const to = mirror.getCursor('to');
-    const cursorPos = mirror.getCursor();
+  updateCursor(): void {
+    const from = this.editor.getCursor('from');
+    const to = this.editor.getCursor('to');
+    const cursorPos = this.editor.getCursor();
     this.cursorChange.emit(cursorPos);
 
     if (from.line === to.line && from.ch === to.ch) {
@@ -91,29 +95,30 @@ export class TerminalComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
-  listenSelection(): void {
-    let mousedown$ = fromEvent<MouseEvent>(this.terminal.nativeElement, 'mousedown');
-    let mousemove$ = fromEvent<MouseEvent>(document, 'mousemove');
-    let mouseup$ = fromEvent<MouseEvent>(document, 'mouseup');
+  // DEPRECATED
+  // listenSelection(): void {
+  //   let mousedown$ = fromEvent<MouseEvent>(this.terminal.nativeElement, 'mousedown');
+  //   let mousemove$ = fromEvent<MouseEvent>(document, 'mousemove');
+  //   let mouseup$ = fromEvent<MouseEvent>(document, 'mouseup');
 
-    let mousedrag$ = mousedown$.pipe(
-      switchMap(() => mousemove$.pipe(
-        map((event: MouseEvent) => event.preventDefault()),
-        takeUntil(mouseup$)
-      )),
-      takeUntil(this.ngUnsubscribe)
-    );
+  //   let mousedrag$ = mousedown$.pipe(
+  //     switchMap(() => mousemove$.pipe(
+  //       map((event: MouseEvent) => event.preventDefault()),
+  //       takeUntil(mouseup$)
+  //     )),
+  //     takeUntil(this.ngUnsubscribe)
+  //   );
 
-    mousedrag$.pipe(debounceTime(10)).subscribe(() => {
-      const from = this.editor.getCursor('from');
-      const to = this.editor.getCursor('to');
+  //   mousedrag$.pipe(debounceTime(10)).subscribe(() => {
+  //     const from = this.editor.getCursor('from');
+  //     const to = this.editor.getCursor('to');
 
-      if (from.line === to.line && from.ch === to.ch) {
-        return;
-      }
-      this.selectionChange.emit({ from: this.editor.getCursor('from'), to: this.editor.getCursor('to'), head: this.editor.getCursor('head') })
-    });
-  }
+  //     if (from.line === to.line && from.ch === to.ch) {
+  //       return;
+  //     }
+  //     this.selectionChange.emit({ from: this.editor.getCursor('from'), to: this.editor.getCursor('to'), head: this.editor.getCursor('head') })
+  //   });
+  // }
 
   execute(): void {
     this.terminalService.eval(this.contentControl!.value).subscribe(log => {
@@ -121,16 +126,33 @@ export class TerminalComponent implements OnInit, OnDestroy, AfterViewInit {
     });
   }
 
+  onCursorChange(): void {
+    this.updateCursor();
+    const from = this.editor.getCursor('from');
+    const to = this.editor.getCursor('to');
+
+    if (from.line === to.line && from.ch === to.ch) {
+      return;
+    }
+    this.selectionChange.emit({ from: this.editor.getCursor('from'), to: this.editor.getCursor('to'), head: this.editor.getCursor('head') })
+  }
+
+  onScrollChange(event: any): void {
+    this.scroll$.next(event);
+  }
+
   private listenMouseMove() {
     const terminal = this.terminal.nativeElement;
     fromEvent<MouseEvent>(terminal, 'mouseleave').pipe(takeUntil(this.ngUnsubscribe)).subscribe(() => {
       this.mouseLeave.emit({ x: null, y: null });
     })
-    fromEvent<MouseEvent>(terminal, 'mousemove').pipe(takeUntil(this.ngUnsubscribe)).pipe(throttleTime(10)).subscribe(({ clientX, clientY }) => {
+
+    const mousemove$ = combineLatest([fromEvent<MouseEvent>(terminal, 'mousemove'), this.scroll$]);
+
+    mousemove$.pipe(takeUntil(this.ngUnsubscribe)).pipe(throttleTime(10)).subscribe(([{ clientX, clientY }, { top, left }]) => {
       const rect = terminal.getBoundingClientRect();
-      const editorRect = this.terminal.nativeElement.querySelector('.CodeMirror-scroll');
-      const x = (clientX - rect.left) + editorRect.scrollLeft;
-      const y = (clientY - rect.top) + editorRect.scrollTop;
+      const x = (clientX - rect.left) + left;
+      const y = (clientY - rect.top) + top;
       this.mouseMove.emit({ x, y });
     })
   };
@@ -138,6 +160,7 @@ export class TerminalComponent implements OnInit, OnDestroy, AfterViewInit {
   private listenForm() {
     this.form.valueChanges.pipe(takeUntil(this.ngUnsubscribe)).subscribe(({ content }) => {
       this.changed.emit(content);
+      this.updateCursor();
     });
   }
 }
