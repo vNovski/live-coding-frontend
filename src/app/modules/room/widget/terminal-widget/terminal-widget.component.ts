@@ -1,5 +1,5 @@
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, SkipSelf, ViewChild } from '@angular/core';
-import { Subject, takeUntil } from 'rxjs';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, Renderer2, SkipSelf, ViewChild } from '@angular/core';
+import { BehaviorSubject, Subject, takeUntil } from 'rxjs';
 import { SocketService } from 'src/app/core/services/socket/socket.service';
 import addAlpha from 'src/app/core/utils/addAlpha';
 import { TerminalLogTypes as TerminalLogTypes } from 'src/app/shared/components/terminal/enums/terminal-log-types.enum';
@@ -32,18 +32,21 @@ export class TerminalWidgetComponent implements OnInit, AfterViewInit, OnDestroy
 
   otherCursors: any = [];
   fullscreenStatus = false;
-  otherMouses: any = [];
+  otherMouseElements: Map<string, SVGElement> = new Map<string, SVGElement>();
 
   private selectionMarkers: Map<string, any> = new Map();
   private cursorMarkers: Map<string, any> = new Map();
   private ngUnsubscribe: Subject<void> = new Subject<void>();
+
+  private editorScroll: HTMLElement | null = null;
 
   constructor(
     @SkipSelf() readonly roomService: RoomService,
     public readonly terminalWidgetService: TerminalWidgetService,
     private readonly logService: LogService,
     private readonly socketService: SocketService,
-    private readonly cdRef: ChangeDetectorRef
+    private readonly cdRef: ChangeDetectorRef,
+    private readonly renderer: Renderer2,
   ) { }
 
   ngOnInit(): void {
@@ -60,18 +63,49 @@ export class TerminalWidgetComponent implements OnInit, AfterViewInit, OnDestroy
     });
 
     this.roomService.connections$.pipe(takeUntil(this.ngUnsubscribe)).subscribe(connections => {
-      this.otherMouses = connections.map((id) => ({ x: null, y: null, color: null, userId: id }));
+      if (!this.editorScroll) {
+        this.editorScroll = this.terminal.terminal.nativeElement.querySelector('.CodeMirror-scroll');
+      }
+
+      connections.forEach((userId) => {
+        const mouseEl = this.createMouseEl(userId, '');
+        this.otherMouseElements.set(userId, mouseEl);
+        this.renderer.appendChild(this.editorScroll, mouseEl);
+      })
     });
 
     // TODO: избавиться от socket service
     this.socketService.on(TermianlEvents.mouseMove).pipe(takeUntil(this.ngUnsubscribe)).subscribe((receivedMouse) => {
-      this.otherMouses = this.otherMouses.map((mouse: any) => mouse.userId === receivedMouse.userId ? { ...receivedMouse } : mouse);
+      const mouse = this.otherMouseElements.get(receivedMouse.userId);
+      this.renderer.setStyle(mouse, 'fill', receivedMouse.color);
+      this.renderer.setStyle(mouse, 'top', receivedMouse.y || -100);
+      this.renderer.setStyle(mouse, 'left', receivedMouse.x || -100);
       this.cdRef.markForCheck();
     });
   }
 
   ngAfterViewInit(): void {
   }
+
+
+  createMouseEl(id: string, color: string, top = -100, left = -100): SVGElement {
+    const mouse = this.renderer.createElement('svg', 'svg');
+    this.renderer.addClass(mouse, 'mouse');
+    this.renderer.setAttribute(mouse, 'fill', color);
+    this.renderer.setAttribute(mouse, 'xmlns', 'http://www.w3.org/2000/svg');
+    this.renderer.setAttribute(mouse, 'viewBox', '0 0 24 24');
+    this.renderer.setAttribute(mouse, 'width', '24px');
+    this.renderer.setAttribute(mouse, 'id', id);
+    this.renderer.setStyle(mouse, 'top', top);
+    this.renderer.setStyle(mouse, 'left', left);
+    mouse.innerHTML = `
+    <path
+       d="M8.3,3.213l9.468,8.836c0.475,0.443,0.2,1.24-0.447,1.296L13.2,13.7l2.807,6.21c0.272,0.602,0.006,1.311-0.596,1.585l0,0
+       c-0.61,0.277-1.33,0-1.596-0.615L11.1,14.6l-2.833,2.695C7.789,17.749,7,17.411,7,16.751V3.778C7,3.102,7.806,2.752,8.3,3.213z"/>
+    `
+    return mouse;
+  }
+
 
   toggleFullscreen(): void {
     this.fullscreenStatus = !this.fullscreenStatus;
