@@ -3,7 +3,8 @@ import { CommonModule } from '@angular/common';
 import { TerminalModule } from './components/terminal/terminal.module';
 
 @NgModule({
-  declarations: [],
+  declarations: [
+  ],
   imports: [
     CommonModule,
     TerminalModule

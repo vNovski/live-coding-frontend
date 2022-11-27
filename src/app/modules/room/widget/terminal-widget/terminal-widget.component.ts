@@ -1,12 +1,10 @@
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, Renderer2, SkipSelf, ViewChild } from '@angular/core';
-import { BehaviorSubject, Subject, takeUntil } from 'rxjs';
-import { SocketService } from 'src/app/core/services/socket/socket.service';
+import { Subject, takeUntil } from 'rxjs';
 import addAlpha from 'src/app/core/utils/addAlpha';
-import { TerminalLogTypes as TerminalLogTypes } from 'src/app/shared/components/terminal/enums/terminal-log-types.enum';
+import { TerminalLogTypes } from 'src/app/shared/components/terminal/enums/terminal-log-types.enum';
 import { TerminalLog } from 'src/app/shared/components/terminal/interfaces/terminal-log.interface';
 import { TerminalComponent } from 'src/app/shared/components/terminal/terminal.component';
 import { RoomService } from '../../room.service';
-import { TermianlEvents } from '../enums/terminal-events.enum';
 import { LogService } from './services/log.service';
 import { TerminalWidgetService } from './services/terminal-widget.service';
 
@@ -20,6 +18,7 @@ import { TerminalWidgetService } from './services/terminal-widget.service';
 })
 export class TerminalWidgetComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('terminal', { static: true }) terminal!: TerminalComponent;
+  @ViewChild('terminalWidget', { static: true, read: ElementRef }) terminalWidget!: ElementRef;
   @Input('code') code: string = '';
 
   @Output() fullscreenChange = new EventEmitter<boolean>();
@@ -40,11 +39,12 @@ export class TerminalWidgetComponent implements OnInit, AfterViewInit, OnDestroy
 
   private editorScroll: HTMLElement | null = null;
 
+  outsideScreenIndicators: Map<string, any> = new Map();
+
   constructor(
     @SkipSelf() readonly roomService: RoomService,
     public readonly terminalWidgetService: TerminalWidgetService,
     private readonly logService: LogService,
-    private readonly socketService: SocketService,
     private readonly cdRef: ChangeDetectorRef,
     private readonly renderer: Renderer2,
   ) { }
@@ -74,21 +74,93 @@ export class TerminalWidgetComponent implements OnInit, AfterViewInit, OnDestroy
       })
     });
 
-    // TODO: избавиться от socket service
-    this.socketService.on(TermianlEvents.mouseMove).pipe(takeUntil(this.ngUnsubscribe)).subscribe((receivedMouse) => {
-      const mouse = this.otherMouseElements.get(receivedMouse.userId);
-      this.renderer.setStyle(mouse, 'fill', receivedMouse.color);
-      this.renderer.setStyle(mouse, 'top', receivedMouse.y || -100);
-      this.renderer.setStyle(mouse, 'left', receivedMouse.x || -100);
-      this.cdRef.markForCheck();
+    this.terminalWidgetService.otherMouseMove$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((receivedMouse) => {
+      this.updateOtherMousePosition(receivedMouse);
     });
   }
 
   ngAfterViewInit(): void {
   }
 
+  private updateOtherMousePosition(mouse: any): void {
+    const terminalWidgetRect = this.terminalWidget.nativeElement?.getBoundingClientRect();
+    const terminalWidgetWidth = terminalWidgetRect!.width;
+    const terminalWidgetHeight = terminalWidgetRect!.height;
+    const editorScrollTop = this.editorScroll!.scrollTop;
+    const editorScrollLeft = this.editorScroll!.scrollLeft;
 
-  createMouseEl(id: string, color: string, top = -100, left = -100): SVGElement {
+    const rotationAngle = 90;
+    const initialAngle = -45;
+
+    const angles = {
+      bottom: initialAngle,
+      left: initialAngle + rotationAngle,
+      top: initialAngle + (rotationAngle * 2),
+      right: initialAngle + (rotationAngle * 3),
+    }
+
+    const result: any = { color: mouse.color, angle: initialAngle };
+    const isLeft = mouse.x < editorScrollLeft;
+    const isRight = mouse.x > terminalWidgetWidth + editorScrollLeft;
+    const isBottom = mouse.y >= terminalWidgetHeight + editorScrollTop;
+    const isTop = mouse.y < editorScrollTop;
+
+    if (isTop) { // TOP
+      result.top = 5;
+      result.left = Math.min(mouse.x - editorScrollLeft, terminalWidgetWidth - 25);
+      result.angle = angles.top;
+    }
+
+    if (isRight) { // RIGHT
+      result.top = Math.max(Math.min(mouse.y - editorScrollTop, terminalWidgetHeight - 25), 0);
+      result.left = terminalWidgetWidth - 25;
+      result.angle = angles.right;
+    }
+
+    if (isBottom) { // BOTTOM
+      result.top = terminalWidgetHeight - 25;
+      result.left = Math.min(mouse.x - editorScrollLeft, terminalWidgetWidth - 25);
+      result.angle = angles.bottom;
+    }
+
+    if (isLeft) { // LEFT
+      result.left = 5;
+      result.top = Math.max(Math.min(mouse.y - editorScrollTop, terminalWidgetHeight - 25), 0);
+      result.angle = angles.left;
+    }
+
+    if(isTop && isRight) {
+      result.angle -=  rotationAngle / 2;
+    }
+
+    if(isTop && isLeft) {
+      result.angle +=  rotationAngle / 2;
+    }
+
+    if(isBottom && isLeft) {
+      result.angle = 0;
+    }
+
+    if(isBottom && isRight) {
+      result.angle -=  rotationAngle / 2;
+    }
+
+    if(result.top === undefined) {
+      result.display = 'none';
+    }
+
+
+
+
+    this.outsideScreenIndicators.set(mouse.userId, result);
+    const mouseEl = this.otherMouseElements.get(mouse.userId);
+    this.renderer.setStyle(mouseEl, 'fill', mouse.color);
+    this.renderer.setStyle(mouseEl, 'top', mouse.y || -100);
+    this.renderer.setStyle(mouseEl, 'left', mouse.x || -100);
+    this.cdRef.markForCheck();
+  }
+
+  private createMouseEl(id: string, color: string, top = -100, left = -100): SVGElement {
     const mouse = this.renderer.createElement('svg', 'svg');
     this.renderer.addClass(mouse, 'mouse');
     this.renderer.setAttribute(mouse, 'fill', color);
@@ -137,6 +209,10 @@ export class TerminalWidgetComponent implements OnInit, AfterViewInit, OnDestroy
     this.terminalWidgetService.shareExecutionLog(this.roomService.id, log);
     this.log(log);
 
+  }
+
+  trackOutsideScreenInicators(index: number, indicator: any): string {
+    return indicator.userId;
   }
 
   private log(log: TerminalLog): void {

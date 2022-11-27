@@ -149,7 +149,7 @@ export class TerminalComponent implements OnInit, OnDestroy, AfterViewInit {
 
     const mousemove$ = combineLatest([fromEvent<MouseEvent>(terminal, 'mousemove'), this.scroll$]);
 
-    mousemove$.pipe(takeUntil(this.ngUnsubscribe)).pipe(throttleTime(10)).subscribe(([{ clientX, clientY }, { top, left }]) => {
+    mousemove$.pipe(takeUntil(this.ngUnsubscribe)).pipe(throttleTime(100)).subscribe(([{ clientX, clientY }, { top, left }]) => {
       const rect = terminal.getBoundingClientRect();
       const x = (clientX - rect.left) + left;
       const y = (clientY - rect.top) + top;
@@ -158,8 +158,9 @@ export class TerminalComponent implements OnInit, OnDestroy, AfterViewInit {
   };
 
   private listenForm() {
-    this.form.valueChanges.pipe(takeUntil(this.ngUnsubscribe)).subscribe(({ content }) => {
-      this.changed.emit(content);
+    this.form.valueChanges.pipe(takeUntil(this.ngUnsubscribe)).subscribe((data) => {
+      console.log(data);
+      this.changed.emit(data.content);
       this.updateCursor();
     });
   }

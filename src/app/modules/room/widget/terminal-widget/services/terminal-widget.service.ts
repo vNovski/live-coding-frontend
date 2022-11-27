@@ -10,6 +10,7 @@ export class TerminalWidgetService {
   public otherSelectionChange$ = this.socketService.on(TermianlEvents.selectionChange);
   public executionLog$ = this.socketService.on(TermianlEvents.executionLog);
   public otherChanged$ = this.socketService.on(TermianlEvents.change);
+  public otherMouseMove$  = this.socketService.on(TermianlEvents.mouseMove);
 
   constructor(private readonly socketService: SocketService) { }
 
