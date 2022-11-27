@@ -22,8 +22,10 @@
     position: absolute;
     top: 1rem;
     left: 1rem;
+    z-index: 5;
 
     &.hide {
         opacity: 0;
+        pointer-events: none;
     }
 }
