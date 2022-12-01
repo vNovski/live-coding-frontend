@@ -1,12 +1,27 @@
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, Renderer2, SkipSelf, ViewChild } from '@angular/core';
-import { Subject, takeUntil } from 'rxjs';
-import addAlpha from 'src/app/core/utils/addAlpha';
+import {
+  AfterViewInit,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  EventEmitter,
+  OnDestroy,
+  OnInit,
+  Output,
+  Renderer2,
+  SkipSelf,
+  ViewChild
+} from '@angular/core';
+import { BehaviorSubject, combineLatest, fromEvent, Subject, takeUntil, throttleTime } from 'rxjs';
 import { TerminalLogTypes } from 'src/app/shared/components/terminal/enums/terminal-log-types.enum';
 import { TerminalLog } from 'src/app/shared/components/terminal/interfaces/terminal-log.interface';
-import { TerminalComponent } from 'src/app/shared/components/terminal/terminal.component';
 import { RoomService } from '../../room.service';
 import { LogService } from './services/log.service';
 import { TerminalWidgetService } from './services/terminal-widget.service';
+import { FormBuilder } from '@angular/forms';
+import { TerminalComponent } from '../../../../shared/components/terminal/terminal.component';
+import addAlpha from '../../../../core/utils/addAlpha';
+import { TerminalChange } from './interfaces/terminal-change.interface';
 
 
 @Component({
@@ -17,17 +32,17 @@ import { TerminalWidgetService } from './services/terminal-widget.service';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TerminalWidgetComponent implements OnInit, AfterViewInit, OnDestroy {
-  @ViewChild('terminal', { static: true }) terminal!: TerminalComponent;
+  @ViewChild('terminalContainer', { static: true }) terminalContainer!: ElementRef;
+  @ViewChild('editor', { static: true }) editor!: TerminalComponent;
   @ViewChild('terminalWidget', { static: true, read: ElementRef }) terminalWidget!: ElementRef;
-  @Input('code') code: string = '';
+  code: string = '';
 
   @Output() fullscreenChange = new EventEmitter<boolean>();
 
-  options = {
-    lineNumbers: true,
-    theme: 'material',
-    mode: 'javascript'
-  }
+
+  terminalForm = this.fb.group({
+    content: { value: '', change: null }
+  });
 
   otherCursors: any = [];
   fullscreenStatus = false;
@@ -38,6 +53,11 @@ export class TerminalWidgetComponent implements OnInit, AfterViewInit, OnDestroy
   private ngUnsubscribe: Subject<void> = new Subject<void>();
 
   private editorScroll: HTMLElement | null = null;
+  private scroll$: BehaviorSubject<{ left: number, top: number }> = new BehaviorSubject<{ left: number, top: number }>({ left: 0, top: 0 });
+
+  get contentControl() {
+    return this.terminalForm.get('content');
+  }
 
   outsideScreenIndicators: Map<string, any> = new Map();
 
@@ -46,10 +66,14 @@ export class TerminalWidgetComponent implements OnInit, AfterViewInit, OnDestroy
     public readonly terminalWidgetService: TerminalWidgetService,
     private readonly logService: LogService,
     private readonly cdRef: ChangeDetectorRef,
+    private readonly fb: FormBuilder,
     private readonly renderer: Renderer2,
-  ) { }
+  ) {
+  }
 
   ngOnInit(): void {
+    this.listenForm();
+    this.listenMouseMove();
     this.terminalWidgetService.otherSelectionChange$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((receivedSelection: any) => {
       this.renderOtherSelections(receivedSelection);
     });
@@ -58,13 +82,21 @@ export class TerminalWidgetComponent implements OnInit, AfterViewInit, OnDestroy
       this.renderOtherCursors(receivedCursor);
     });
 
+    this.terminalWidgetService.initialState$.pipe(takeUntil(this.ngUnsubscribe)).subscribe(({ value }: { value: string }) => {
+      this.contentControl!.patchValue({ value }, { emitEvent: false });
+    });
+
+    this.terminalWidgetService.otherChanged$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((change: any) => {
+      this.contentControl!.patchValue({ change }, { emitEvent: false })
+    });
+
     this.terminalWidgetService.executionLog$.pipe(takeUntil(this.ngUnsubscribe)).subscribe((log: TerminalLog) => {
       this.log(log);
     });
 
     this.roomService.connections$.pipe(takeUntil(this.ngUnsubscribe)).subscribe(connections => {
       if (!this.editorScroll) {
-        this.editorScroll = this.terminal.terminal.nativeElement.querySelector('.CodeMirror-scroll');
+        this.editorScroll = this.terminalContainer.nativeElement.querySelector('.CodeMirror-scroll');
       }
 
       connections.forEach((userId) => {
@@ -129,27 +161,25 @@ export class TerminalWidgetComponent implements OnInit, AfterViewInit, OnDestroy
       result.angle = angles.left;
     }
 
-    if(isTop && isRight) {
-      result.angle -=  rotationAngle / 2;
+    if (isTop && isRight) {
+      result.angle -= rotationAngle / 2;
     }
 
-    if(isTop && isLeft) {
-      result.angle +=  rotationAngle / 2;
+    if (isTop && isLeft) {
+      result.angle += rotationAngle / 2;
     }
 
-    if(isBottom && isLeft) {
+    if (isBottom && isLeft) {
       result.angle = 0;
     }
 
-    if(isBottom && isRight) {
-      result.angle -=  rotationAngle / 2;
+    if (isBottom && isRight) {
+      result.angle -= rotationAngle / 2;
     }
 
-    if(result.top === undefined) {
+    if (result.top === undefined) {
       result.display = 'none';
     }
-
-
 
 
     this.outsideScreenIndicators.set(mouse.userId, result);
@@ -184,36 +214,68 @@ export class TerminalWidgetComponent implements OnInit, AfterViewInit, OnDestroy
     this.fullscreenChange.emit(this.fullscreenStatus);
   }
 
-  terminalChanged(code: string): void {
-    this.roomService.terminalChanged(code);
+  terminalChanged(change: TerminalChange): void {
+    this.roomService.terminalChanged(change);
+  }
+
+  onCursorActivity(editor: any): void {
+
+    const from = editor.getCursor('from');
+    const to = editor.getCursor('to');
+
+    const cursorPos = editor.getCursor();
+    this.cursorChange(cursorPos);
+
+    if (from.line === to.line && from.ch === to.ch) {
+      this.selectionChange({ from: null, to: null, head: null });
+      return;
+    }
+    this.selectionChange({ from: editor.getCursor('from'), to: editor.getCursor('to'), head: editor.getCursor('head') })
   }
 
   execute(): void {
-    this.terminal.execute();
+    this.terminalWidgetService.eval(this.contentControl!.value.value).subscribe(log => {
+      this.terminalWidgetService.shareExecutionLog(this.roomService.id, log);
+      this.log(log);
+    });
   }
 
   cursorChange(position: any): void {
     this.roomService.cursorChange(position);
   }
 
-  selectionChange(position: any): void {
-    this.roomService.selectionChange(position);
-  }
-
-
-  mouseMove(position: { x: number | null, y: number | null }): void {
-    this.roomService.mouseMove(position);
-  }
-
-  executionLog(log: TerminalLog): void {
-    this.terminalWidgetService.shareExecutionLog(this.roomService.id, log);
-    this.log(log);
-
-  }
 
   trackOutsideScreenInicators(index: number, indicator: any): string {
     return indicator.userId;
   }
+
+  onScrollChange(event: any): void {
+    this.scroll$.next(event);
+  }
+
+  private selectionChange(position: any): void {
+    this.roomService.selectionChange(position);
+  }
+
+  private mouseLeave(): void {
+    this.roomService.mouseMove({ x: null, y: null });
+  }
+
+  private listenMouseMove() {
+    const terminal = this.terminalContainer.nativeElement;
+    fromEvent<MouseEvent>(terminal, 'mouseleave').pipe(takeUntil(this.ngUnsubscribe)).subscribe(() => {
+      this.mouseLeave();
+    })
+
+    const mousemove$ = combineLatest([fromEvent<MouseEvent>(terminal, 'mousemove'), this.scroll$]);
+
+    mousemove$.pipe(takeUntil(this.ngUnsubscribe)).pipe(throttleTime(100)).subscribe(([{ clientX, clientY }, scroll]) => {
+      const rect = terminal.getBoundingClientRect();
+      const x = (clientX - rect.left) + scroll.left;
+      const y = (clientY - rect.top) + scroll.top;
+      this.roomService.mouseMove({ x, y });
+    })
+  };
 
   private log(log: TerminalLog): void {
     switch (log.type) {
@@ -235,23 +297,23 @@ export class TerminalWidgetComponent implements OnInit, AfterViewInit, OnDestroy
   }
 
   private renderOtherCursors(cursor: any): void {
-    if (cursor && this.terminal.editor) {
+    if (cursor && this.editor.codeMirror) {
       const marker = this.cursorMarkers.get(cursor.color);
 
       if (marker) {
         marker.clear();
       }
-      const cursorCoords = this.terminal.editor.cursorCoords(cursor);
+      const cursorCoords = this.editor.codeMirror.cursorCoords(cursor);
       const cursorElement = document.createElement('span');
       cursorElement.classList.add('other-cursor')
       cursorElement.style.borderLeftColor = cursor.color;
       cursorElement.style.height = `${(cursorCoords.bottom - cursorCoords.top)}px`;
-      this.cursorMarkers.set(cursor.color, this.terminal.editor.setBookmark(cursor, { widget: cursorElement }));
+      this.cursorMarkers.set(cursor.color, this.editor.codeMirror.setBookmark(cursor, { widget: cursorElement }));
     }
   }
 
   private renderOtherSelections(selection: any): void {
-    if (selection && this.terminal.editor) {
+    if (selection && this.editor.codeMirror) {
       const { from, to, color } = selection;
       const marker = this.selectionMarkers.get(color);
       if (marker) {
@@ -260,8 +322,14 @@ export class TerminalWidgetComponent implements OnInit, AfterViewInit, OnDestroy
       if (!(from || to)) {
         return;
       }
-      this.selectionMarkers.set(selection.color, (this.terminal.editor as any).doc.markText(from, to, { css: `background: ${addAlpha(color, 0.5)}` }));
+      this.selectionMarkers.set(selection.color, (this.editor.codeMirror as any).doc.markText(from, to, { css: `background: ${addAlpha(color, 0.5)}` }));
     }
+  }
+
+  private listenForm() {
+    this.terminalForm.valueChanges.pipe(takeUntil(this.ngUnsubscribe)).subscribe(({ content } : { content: TerminalChange }) => {
+      this.terminalChanged(content);
+    });
   }
 
   ngOnDestroy() {

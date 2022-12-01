@@ -6,6 +6,7 @@ import { UserService } from 'src/app/core/services/user/user.service';
 import { RoomEvents } from './enums/room-events.enum';
 import { RoomModule } from './room.module';
 import { TermianlEvents } from './widget/enums/terminal-events.enum';
+import { TerminalChange } from './widget/terminal-widget/interfaces/terminal-change.interface';
 
 @Injectable()
 export class RoomService {
@@ -85,7 +86,7 @@ export class RoomService {
   }
 
 
-  terminalChanged(code: string): void {
-    this.socketService.emit(TermianlEvents.change, { roomId: this.id, data: code });
+  terminalChanged(change: TerminalChange): void {
+    this.socketService.emit(TermianlEvents.change, { roomId: this.id, data: change });
   }
 }

@@ -5,6 +5,7 @@ import { Socket } from 'ngx-socket-io';
 import { ConnectionsService } from './core/services/connections/connections.service';
 import { CommunicationEventTypes, SocketService } from './core/services/socket/socket.service';
 import { UserService } from './core/services/user/user.service';
+import { FormBuilder } from '@angular/forms';
 
 @Component({
   selector: 'app-root',
@@ -13,5 +14,10 @@ import { UserService } from './core/services/user/user.service';
 })
 export class AppComponent {
   year = new Date().getFullYear();
- 
+  form = this.fb.group({
+    content: ``
+  });
+
+  constructor(    private readonly fb: FormBuilder,) {
+  }
 }

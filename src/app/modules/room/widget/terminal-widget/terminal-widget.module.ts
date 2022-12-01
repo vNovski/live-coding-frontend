@@ -18,7 +18,12 @@ import { SharedModule } from 'src/app/shared/shared.module';
     MaterialModule,
     SharedModule
   ],
+  exports: [
+    CommonModule,
+    ReactiveFormsModule,
+    FormsModule,
+    TerminalWidgetComponent
+  ],
   providers: [],
-  exports: [TerminalWidgetComponent]
 })
 export class TerminalWidgetModule { }

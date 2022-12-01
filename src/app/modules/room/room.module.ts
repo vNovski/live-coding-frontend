@@ -5,17 +5,17 @@ import { MaterialModule } from 'src/app/material.module';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { RoomRoutingModule } from './room-routing.module';
 import { RoomComponent } from './room.component';
-import { TerminalWidgetComponent } from './widget/terminal-widget/terminal-widget.component';
+import { TerminalWidgetModule } from './widget/terminal-widget/terminal-widget.module';
 
 
 
 @NgModule({
   declarations: [
     RoomComponent,
-    TerminalWidgetComponent
   ],
   imports: [
     CommonModule,
+    TerminalWidgetModule,
     RoomRoutingModule,
     MaterialModule,
     SharedModule
