@@ -15,8 +15,11 @@ import {
   ViewChild,
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { Editor, EditorChange, EditorFromTextArea, ScrollInfo } from 'codemirror';
+import { Editor, EditorChange, EditorFromTextArea, Position, ScrollInfo } from 'codemirror';
 import { isNill } from 'src/app/core/utils/isNill';
+import { js_beautify } from 'js-beautify';
+import { TerminalShortcuts } from './enums/terminal-shortcuts.enum';
+
 
 function normalizeLineEndings(str: string): string {
   if (!str) {
@@ -27,6 +30,7 @@ function normalizeLineEndings(str: string): string {
 
 declare var require: any;
 declare var CodeMirror: any;
+
 
 @Component({
   selector: 'app-terminal',
@@ -106,12 +110,7 @@ export class TerminalComponent implements AfterViewInit, OnDestroy, ControlValue
 
   ngAfterViewInit() {
     this._ngZone.runOutsideAngular(async () => {
-      const codeMirrorObj = await this.codeMirrorGlobal;
-      const codeMirror = codeMirrorObj?.default ? codeMirrorObj.default : codeMirrorObj;
-      this.codeMirror = codeMirror.fromTextArea(
-        this.ref.nativeElement,
-        this._options,
-      ) as EditorFromTextArea;
+      this.codeMirror = await this.createEditor();
       this.codeMirror.on('cursorActivity', cm => this._ngZone.run(() => this.cursorActive(cm)));
       this.codeMirror.on('scroll', this.scrollChanged.bind(this));
       this.codeMirror.on('blur', () => this._ngZone.run(() => this.focusChanged(false)));
@@ -227,6 +226,56 @@ export class TerminalComponent implements AfterViewInit, OnDestroy, ControlValue
   setDisabledState(isDisabled: boolean) {
     this.disabled = isDisabled;
     this.setOptionIfChanged('readOnly', this.disabled);
+  }
+
+  private async createEditor(): Promise<EditorFromTextArea> {
+    const codeMirrorObj = await this.codeMirrorGlobal;
+    const codeMirror = codeMirrorObj?.default ? codeMirrorObj.default : codeMirrorObj;
+    return codeMirror.fromTextArea(
+      this.ref.nativeElement,
+      {
+        ...this._options,
+        extraKeys: {
+          [TerminalShortcuts.format]: this.beautify,
+          [TerminalShortcuts.comment]: this.comment
+        },
+      }
+    ) as EditorFromTextArea;
+  }
+
+  private comment(cm: Editor): void {
+    const from = { line: cm.getCursor('from').line, ch: 0 };
+    const to = { line: cm.getCursor('to').line } as Position;
+    const lines = cm.getRange(from, to).split('\n');
+
+    const uncomment = lines.every((line: string) => line.startsWith('//'));
+    let text = '';
+    if (uncomment) {
+      text = lines.map((line: string) => line.slice(2)).join('\n');
+    } else {
+      text = lines.map((line: string) => '//' + line).join('\n')
+    }
+    cm.replaceRange(text, from, to);
+  }
+
+  private beautify(cm: Editor): void {
+      cm.setValue(js_beautify(cm.getValue(), {
+        indent_size: 2,
+        indent_char: ' ',
+        max_preserve_newlines: 2,
+        preserve_newlines: true,
+        keep_array_indentation: false,
+        break_chained_methods: false,
+        brace_style: 'collapse',
+        space_before_conditional: true,
+        unescape_strings: false,
+        jslint_happy: false,
+        end_with_newline: false,
+        wrap_line_length: 0,
+        comma_first: false,
+        e4x: false,
+        indent_empty_lines: false
+      }));
   }
   /** Implemented as part of ControlValueAccessor. */
   private onChange = (_: any) => { };
