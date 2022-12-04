@@ -1,0 +1,34 @@
+@import "../../../../../../../theme/index.scss";
+
+code {
+    background: #263238;
+    border: 1px solid #3d4950;
+    padding: 5px;
+}
+
+.shortcuts-container {
+    height: 70vh;
+}
+
+.mat-column-binding {
+    width: 20%;
+}
+
+.mat-column-command {
+    width: 50%;
+}
+
+.shortcuts {
+    width: 100%;
+    background: $background;
+
+    th {
+        font-weight: bold;
+        font-size: 16px;
+    }
+
+    th,
+    td {
+        color: #ccc;
+    }
+}

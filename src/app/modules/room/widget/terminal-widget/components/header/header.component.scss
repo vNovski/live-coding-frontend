@@ -1,20 +1,47 @@
 @import "../../../../../../../theme/index.scss";
 
 ::ng-deep .settings-menu {
-    background:#263238;
-    border-radius: 12px!important;
+    background: #263238;
+    border-radius: 12px !important;
     margin-top: 4px;
-    
+
     button {
-        color: #ccc!important;
+        color: #ccc !important;
         font-weight: 500;
 
         mat-icon {
-            color: #546E7A!important;
+            color: #546E7A !important;
         }
-    };
+    }
+
+    ;
 }
 
+::ng-deep .shortcuts-dialog {
+    .mat-dialog-container {
+        background-color: $background;
+        margin: 0;
+        padding: 0;
+    }
+
+    max-width: 100vw;
+    max-height: 100vh;
+    @include for-phone-only {
+        height: 100vh;
+        width: 100vw;
+    }
+
+    @include for-tablet-portrait-up {
+        height: 90vh;
+        width: 90vw;
+    }
+
+    @include for-desktop-up {
+        width: 70%;
+        height: 70vh;
+    }
+
+}
 
 
 .version {
@@ -33,57 +60,57 @@
     background: $background;
 
     .controls {
-      z-index: 5;
-      transition: $default-transition;
+        z-index: 5;
+        transition: $default-transition;
     }
 
     button {
-      transition: all 0.2s ease-in-out;
-      box-shadow: 0 0 5px 0 #00000091;
-      background: #263238;
+        transition: all 0.2s ease-in-out;
+        box-shadow: 0 0 5px 0 #00000091;
+        background: #263238;
 
-      &:not(:last-of-type) {
-        margin-right: 10px;
-      }
-
-      &:hover {
-        box-shadow: $default-shadow;
-        filter: brightness(1.1);
-      }
-
-      &:active {
-        box-shadow: inset $default-shadow;
-      }
-
-      &.execute-btn {
-        .mat-icon {
-          transition: all 0.2s ease-in-out;
-          line-height: 30px;
-          width: 30px;
-          height: 30px;
-          font-size: 30px;
-          color: rgb(48, 107, 57);
-        }
-
-      }
-
-      &.settings-btn {
-        transition: $default-transition;
-
-        mat-icon {
-          transition: $default-transition;
+        &:not(:last-of-type) {
+            margin-right: 10px;
         }
 
         &:hover {
-          mat-icon {
-            transform: rotate(180deg) !important;
-          }
+            box-shadow: $default-shadow;
+            filter: brightness(1.1);
         }
 
         &:active {
-          box-shadow: inset $default-shadow;
-          filter: brightness(1);
+            box-shadow: inset $default-shadow;
         }
-      }
+
+        &.execute-btn {
+            .mat-icon {
+                transition: all 0.2s ease-in-out;
+                line-height: 30px;
+                width: 30px;
+                height: 30px;
+                font-size: 30px;
+                color: rgb(48, 107, 57);
+            }
+
+        }
+
+        &.settings-btn {
+            transition: $default-transition;
+
+            mat-icon {
+                transition: $default-transition;
+            }
+
+            &:hover {
+                mat-icon {
+                    transform: rotate(180deg) !important;
+                }
+            }
+
+            &:active {
+                box-shadow: inset $default-shadow;
+                filter: brightness(1);
+            }
+        }
     }
-  }
+}

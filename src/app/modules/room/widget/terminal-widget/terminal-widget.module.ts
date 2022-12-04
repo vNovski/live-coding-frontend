@@ -7,12 +7,14 @@ import { MaterialModule } from 'src/app/material.module';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { HeaderComponent } from './components/header/header.component';
 import { MouseIndicatorsDirective } from './directives/mouse-indicators.directive';
+import { ShortcutsDialogComponent } from './components/shortcuts-dialog/shortcuts-dialog.component';
 
 @NgModule({
   declarations: [
     TerminalWidgetComponent,
     HeaderComponent,
     MouseIndicatorsDirective,
+    ShortcutsDialogComponent,
   ],
   imports: [
     CommonModule,

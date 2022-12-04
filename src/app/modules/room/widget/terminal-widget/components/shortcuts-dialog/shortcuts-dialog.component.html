@@ -1,0 +1,19 @@
+<div class="shortcuts-container">
+    <table mat-table [dataSource]="shortcuts" class="shortcuts">
+        <ng-container matColumnDef="command">
+            <th mat-header-cell *matHeaderCellDef> Command </th>
+            <td mat-cell *matCellDef="let element"> {{element.command}} </td>
+        </ng-container>
+        <ng-container matColumnDef="binding">
+            <th mat-header-cell *matHeaderCellDef> Binding </th>
+            <td mat-cell *matCellDef="let element">
+                <ng-container *ngFor="let binding of element.binding; let last = last;">
+                    <code>{{binding}}</code> {{ last ? '' : '+' }}
+                </ng-container>
+            </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+</div>

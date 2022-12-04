@@ -4,7 +4,8 @@
             mat-icon-button>
             <mat-icon>play_arrow</mat-icon>
         </button>
-        <button [matMenuTriggerFor]="menu" class="settings-btn icon-button" mat-icon-button>
+        <button [matMenuTriggerFor]="menu" class="settings-btn icon-button"
+            mat-icon-button>
             <mat-icon>settings</mat-icon>
         </button>
         <button (click)="onToggleFullScreen()" class="fullscreen-btn
@@ -15,10 +16,14 @@
     </div>
 </header>
 <mat-menu class="settings-menu" #menu="matMenu">
-    <button mat-menu-item  (click)="onWatch($event)">
+    <button mat-menu-item (click)="onWatch($event)">
         <mat-slide-toggle>
             Watch
-            </mat-slide-toggle>
+        </mat-slide-toggle>
     </button>
+    <button mat-menu-item (click)="openShortcutsDialog()">
+        <mat-icon>keyboard_command_key</mat-icon>
+        <span>Shortcuts</span>
+      </button>
     <span class="version">Version: 1.0.0</span>
-  </mat-menu>
+</mat-menu>

@@ -1,4 +1,6 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import {MatDialog, MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
+import { ShortcutsDialogComponent } from '../shortcuts-dialog/shortcuts-dialog.component';
 
 @Component({
   selector: 'app-terminal-widget-header',
@@ -10,12 +12,13 @@ export class HeaderComponent implements OnInit {
   @Output() watch = new EventEmitter<boolean>();
   @Output() toggleFullScreen = new EventEmitter<boolean>();
 
-  constructor() { }
+  constructor(private readonly dialog: MatDialog) { }
 
   fullscreenStatus = false;
   watchStatus = false;
 
   ngOnInit(): void {
+    this.openShortcutsDialog();
   }
 
 
@@ -33,6 +36,18 @@ export class HeaderComponent implements OnInit {
     this.watchStatus = !this.watchStatus;
     this.watch.emit(this.watchStatus);
 
+  }
+
+  openShortcutsDialog(): void {
+    const dialogRef = this.dialog.open(ShortcutsDialogComponent, {
+      maxWidth: '100vw',
+      maxHeight: '100vh',
+      panelClass: 'shortcuts-dialog'
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('The dialog was closed');
+    });
   }
 
 }
