@@ -1,23 +1,9 @@
-<div class="terminal-widget" [class.fullscreen]="fullscreenStatus">
-    <header class="terminal-widget-header">
-        <div class="controls">
-            <button (click)="execute()" class="execute-btn icon-button"
-                mat-icon-button>
-                <mat-icon>play_arrow</mat-icon>
-            </button>
-            <button class="settings-btn icon-button" mat-icon-button>
-                <mat-icon>settings</mat-icon>
-            </button>
-            <button (click)="toggleFullscreen()" class="fullscreen-btn
-                icon-button"
-                mat-icon-button>
-                <mat-icon>fullscreen</mat-icon>
-            </button>
-        </div>
-
-    </header>
+<div class="terminal-widget"
+    [class.fullscreen]="fullscreenStatus"
+   >
+   <app-terminal-widget-header (execute)="execute()" (toggleFullScreen)="toggleFullscreen($event)"></app-terminal-widget-header>
     <div class="content-wrapper">
-        <div #terminalWidget class="content">
+        <div #terminalWidget class="content"  [appMouseIndicators]="otherMouseMove" [activeMouses]="otherMouses">
             <div #terminalContainer class="terminal">
                 <form [formGroup]="terminalForm">
                     <app-terminal #editor formControlName="content"
@@ -25,18 +11,6 @@
                         (scroll)="onScrollChange($event)"></app-terminal>
                 </form>
             </div>
-            <ng-container *ngFor="let indicator of
-                outsideScreenIndicators.values()
-                trackBy: trackOutsideScreenInicators">
-                <div
-                    class="outside-screen-indicator"
-                    [ngStyle]="{ 'display': indicator.display, 'transform':
-                    'rotate(' +
-                    indicator.angle + 'deg)',
-                    'top.px': indicator.top, 'left.px': indicator.left,
-                    'background':
-                    indicator.color}"></div>
-            </ng-container>
         </div>
 
     </div>

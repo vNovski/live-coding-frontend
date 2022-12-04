@@ -1,0 +1,65 @@
+@import "../../../../../../../theme/index.scss";
+
+.terminal-widget-header {
+    width: 100%;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    background: $background;
+
+    .controls {
+      z-index: 5;
+      transition: $default-transition;
+    }
+
+    button {
+      transition: all 0.2s ease-in-out;
+      box-shadow: 0 0 5px 0 #00000091;
+      background: #263238;
+
+      &:not(:last-of-type) {
+        margin-right: 10px;
+      }
+
+      &:hover {
+        box-shadow: $default-shadow;
+        filter: brightness(1.1);
+      }
+
+      &:active {
+        box-shadow: inset $default-shadow;
+      }
+
+      &.execute-btn {
+        .mat-icon {
+          transition: all 0.2s ease-in-out;
+          line-height: 30px;
+          width: 30px;
+          height: 30px;
+          font-size: 30px;
+          color: rgb(48, 107, 57);
+        }
+
+      }
+
+      &.settings-btn {
+        transition: $default-transition;
+
+        mat-icon {
+          transition: $default-transition;
+        }
+
+        &:hover {
+          mat-icon {
+            transform: rotate(180deg) !important;
+          }
+        }
+
+        &:active {
+          box-shadow: inset $default-shadow;
+          filter: brightness(1);
+        }
+      }
+    }
+  }

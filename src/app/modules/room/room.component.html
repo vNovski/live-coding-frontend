@@ -1,8 +1,21 @@
 <div class="container">
-  <button class="logout-btn icon-button" [class.hide]="hideLeaveBtn" mat-icon-button (click)="leaveRoom()">
+  <button class="logout-btn icon-button" [class.hide]="hideLeaveBtn"
+    mat-icon-button (click)="leaveRoom()">
     <mat-icon>exit_to_app</mat-icon>
   </button>
   <div class="container-wrapper">
-      <app-terminal-widget (fullscreenChange)="fullscreenChange($event)"></app-terminal-widget>
-    </div>
+    <app-terminal-widget
+      [value]="roomService.initialState$ | async"
+      [editorChange]="roomService.otherChanged$ | async"
+      [otherSelection]="roomService.otherSelectionChange$ | async"
+      [otherCursor]="roomService.otherCursorChange$ | async"
+      [otherMouses]="(roomService.connections$ | async) || []"
+      [otherLog]="roomService.executionLog$ | async"
+      (logsChange)="onLogsChange($event)"
+      (change)="onChange($event)"
+      (cursorChange)="onCursorChange($event)"
+      (selectionChange)="onSelectionChange($event)"
+      (mouseMove)="onMouseMove($event)"
+      (fullscreenChange)="fullscreenChange($event)"></app-terminal-widget>
   </div>
+</div>

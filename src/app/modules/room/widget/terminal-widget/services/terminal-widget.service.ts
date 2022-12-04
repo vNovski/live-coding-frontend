@@ -7,19 +7,7 @@ import { fromEvent, Observable, throwError, timer, of } from 'rxjs';
 
 @Injectable()
 export class TerminalWidgetService {
-
-  public otherCursorChange$ = this.socketService.on(TermianlEvents.cursorChange);
-  public otherSelectionChange$ = this.socketService.on(TermianlEvents.selectionChange);
-  public executionLog$ = this.socketService.on(TermianlEvents.executionLog);
-  public otherChanged$ = this.socketService.on(TermianlEvents.change);
-  public otherMouseMove$ = this.socketService.on(TermianlEvents.mouseMove);
-  public initialState$ = this.socketService.on(TermianlEvents.shareState);
-
-  constructor(private readonly socketService: SocketService) {
-  }
-
-  shareExecutionLog(roomId: string, log: TerminalLog): void {
-    this.socketService.emit(TermianlEvents.executionLog, { roomId, data: log })
+  constructor() {
   }
 
   eval(code: string): Observable<TerminalLog> {

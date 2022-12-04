@@ -3,6 +3,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { SocketService } from 'src/app/core/services/socket/socket.service';
 import { UserService } from 'src/app/core/services/user/user.service';
+import { TerminalLog } from 'src/app/shared/components/terminal/interfaces/terminal-log.interface';
 import { RoomEvents } from './enums/room-events.enum';
 import { RoomModule } from './room.module';
 import { TermianlEvents } from './widget/enums/terminal-events.enum';
@@ -16,6 +17,13 @@ export class RoomService {
   public connect$ = this.socketService.on(RoomEvents.join);
   public disconnect$ = this.socketService.on(RoomEvents.leave);
   public initialConnections$ = this.socketService.on(RoomEvents.shareConnections);
+  
+  public otherCursorChange$ = this.socketService.on(TermianlEvents.cursorChange);
+  public otherSelectionChange$ = this.socketService.on(TermianlEvents.selectionChange);
+  public executionLog$ = this.socketService.on(TermianlEvents.executionLog);
+  public otherChanged$ = this.socketService.on(TermianlEvents.change);
+  public otherMouseMove$ = this.socketService.on(TermianlEvents.mouseMove);
+  public initialState$ = this.socketService.on(TermianlEvents.shareState);
 
   get connections$(): Observable<string[]> {
     return this._connections$.asObservable();
@@ -67,6 +75,10 @@ export class RoomService {
     ).subscribe((userId: string) => {
       this._connections$.next(this._connections$.getValue().filter(id => id !== userId))
     })
+  }
+
+  shareExecutionLog(log: TerminalLog) {
+    this.socketService.emit(TermianlEvents.executionLog, { roomId: this.id, data: log })
   }
 
   leaveRoom(): void {

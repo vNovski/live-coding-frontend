@@ -5,10 +5,14 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CodemirrorModule } from '@ctrl/ngx-codemirror';
 import { MaterialModule } from 'src/app/material.module';
 import { SharedModule } from 'src/app/shared/shared.module';
+import { HeaderComponent } from './components/header/header.component';
+import { MouseIndicatorsDirective } from './directives/mouse-indicators.directive';
 
 @NgModule({
   declarations: [
-    TerminalWidgetComponent
+    TerminalWidgetComponent,
+    HeaderComponent,
+    MouseIndicatorsDirective
   ],
   imports: [
     CommonModule,
@@ -24,6 +28,6 @@ import { SharedModule } from 'src/app/shared/shared.module';
     FormsModule,
     TerminalWidgetComponent
   ],
-  providers: [],
+  providers: [MouseIndicatorsDirective],
 })
 export class TerminalWidgetModule { }

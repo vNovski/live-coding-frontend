@@ -5,8 +5,10 @@ import { Subject, takeUntil } from 'rxjs';
 import { ConnectionsService, RoomEvents } from 'src/app/core/services/connections/connections.service';
 import { CommunicationEventTypes, SocketService } from 'src/app/core/services/socket/socket.service';
 import { UserService } from 'src/app/core/services/user/user.service';
+import { TerminalLog } from 'src/app/shared/components/terminal/interfaces/terminal-log.interface';
 import { RoomService } from './room.service';
 import { TermianlEvents } from './widget/enums/terminal-events.enum';
+import { TerminalChange } from './widget/terminal-widget/interfaces/terminal-change.interface';
 
 
 function roomServiceFactory(route: ActivatedRoute, userService: UserService, socketService: SocketService, snackBar: MatSnackBar) {
@@ -27,9 +29,7 @@ function roomServiceFactory(route: ActivatedRoute, userService: UserService, soc
 })
 export class RoomComponent implements OnInit, OnDestroy {
   code = '';
- 
-  otherCursors: any = [];
-  otherSelections: any = [];
+
   communicationEventTypes = CommunicationEventTypes;
   roomId: string | null = null;
   hideLeaveBtn = false;
@@ -50,6 +50,22 @@ export class RoomComponent implements OnInit, OnDestroy {
       this.roomId = id;
       this.socketService.emit(RoomEvents.join, id);
     });
+  }
+
+  onLogsChange(log: TerminalLog): void {
+    this.roomService.shareExecutionLog(log);
+  }
+  onChange(change: TerminalChange): void {
+    this.roomService.terminalChanged(change);
+  }
+  onCursorChange(position: any): void {
+    this.roomService.cursorChange(position);
+  }
+  onSelectionChange(position: any): void {
+    this.roomService.selectionChange(position)
+  }
+  onMouseMove(position: any): void {
+    this.roomService.mouseMove(position);
   }
 
   fullscreenChange(status: boolean): void {
