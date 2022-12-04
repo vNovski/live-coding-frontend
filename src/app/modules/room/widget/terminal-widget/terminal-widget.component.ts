@@ -194,7 +194,6 @@ export class TerminalWidgetComponent implements OnInit, AfterViewInit, OnDestroy
   }
 
   private renderOtherCursors(cursor: any): void {
-    console.log('cursor', cursor);
     if (cursor && this.editor.codeMirror) {
       const marker = this.cursorMarkers.get(cursor.color);
 
