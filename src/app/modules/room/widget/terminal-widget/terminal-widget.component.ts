@@ -47,6 +47,7 @@ export class TerminalWidgetComponent implements OnInit, AfterViewInit, OnDestroy
   }
 
   @Input('editorChange') set editorChange(change: EditorChange) {
+    console.log('CHANGE')
     this.contentControl!.patchValue({ change }, { emitEvent: false })
   }
 
@@ -229,7 +230,6 @@ export class TerminalWidgetComponent implements OnInit, AfterViewInit, OnDestroy
 
   private listenForm() {
     this.terminalForm.valueChanges.pipe(
-      throttleTime(100),
       takeUntil(this.ngUnsubscribe),
     ).subscribe(({ content }: { content: TerminalChange }) => {
       this.change.emit(content);

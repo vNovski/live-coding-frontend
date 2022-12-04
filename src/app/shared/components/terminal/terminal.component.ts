@@ -84,6 +84,7 @@ export class TerminalComponent implements AfterViewInit, OnDestroy, ControlValue
   disabled = false;
   isFocused = false;
   codeMirror?: EditorFromTextArea;
+  ingoreNextChange = false;
   /**
    * either global variable or required library
    */
@@ -116,7 +117,12 @@ export class TerminalComponent implements AfterViewInit, OnDestroy, ControlValue
       this.codeMirror.on('blur', () => this._ngZone.run(() => this.focusChanged(false)));
       this.codeMirror.on('focus', () => this._ngZone.run(() => this.focusChanged(true)));
       this.codeMirror.on('change', (cm, change) =>
-        this._ngZone.run(() => this.codemirrorValueChanged(cm, change)),
+        this._ngZone.run(() => {
+          if(!this.ingoreNextChange) {
+            this.codemirrorValueChanged(cm, change);
+            this.ingoreNextChange = false;
+          }
+        }),
       );
       this.codeMirror.on('drop', (cm, e) => {
         this._ngZone.run(() => this.dropFiles(cm, e));
@@ -155,6 +161,7 @@ export class TerminalComponent implements AfterViewInit, OnDestroy, ControlValue
 
     this.value = cmVal;
     this.onChange({ value: this.value, change: change });
+    console.log('SEND');
   }
   setOptionIfChanged(optionName: string, newValue: any) {
     if (!this.codeMirror) {
@@ -210,6 +217,7 @@ export class TerminalComponent implements AfterViewInit, OnDestroy, ControlValue
 
     if (!isNill(change)) {
       this.lastChange = change;
+      this.ingoreNextChange = true;
       this.codeMirror.replaceRange(change.text, change.from, change.to, change.origin)
     }
   }
@@ -259,23 +267,23 @@ export class TerminalComponent implements AfterViewInit, OnDestroy, ControlValue
   }
 
   private beautify(cm: Editor): void {
-      cm.setValue(js_beautify(cm.getValue(), {
-        indent_size: 2,
-        indent_char: ' ',
-        max_preserve_newlines: 2,
-        preserve_newlines: true,
-        keep_array_indentation: false,
-        break_chained_methods: false,
-        brace_style: 'collapse',
-        space_before_conditional: true,
-        unescape_strings: false,
-        jslint_happy: false,
-        end_with_newline: false,
-        wrap_line_length: 0,
-        comma_first: false,
-        e4x: false,
-        indent_empty_lines: false
-      }));
+    cm.setValue(js_beautify(cm.getValue(), {
+      indent_size: 2,
+      indent_char: ' ',
+      max_preserve_newlines: 2,
+      preserve_newlines: true,
+      keep_array_indentation: false,
+      break_chained_methods: false,
+      brace_style: 'collapse',
+      space_before_conditional: true,
+      unescape_strings: false,
+      jslint_happy: false,
+      end_with_newline: false,
+      wrap_line_length: 0,
+      comma_first: false,
+      e4x: false,
+      indent_empty_lines: false
+    }));
   }
   /** Implemented as part of ControlValueAccessor. */
   private onChange = (_: any) => { };

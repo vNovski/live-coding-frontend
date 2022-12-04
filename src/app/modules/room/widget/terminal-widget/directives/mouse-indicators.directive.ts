@@ -24,7 +24,6 @@ export class MouseIndicatorsDirective implements AfterViewInit {
     if (!this.editorScroll) {
       this.editorScroll = this.elemRef.nativeElement.querySelector('.CodeMirror-scroll')
     }
-
     if (isNill(mouse)) {
       return;
     }
@@ -57,6 +56,9 @@ export class MouseIndicatorsDirective implements AfterViewInit {
   }
 
   private update(mouse: any) {
+    if(!this.editorScroll) {
+      return;
+    }
     const screen = this.getBoundaries(mouse);
     if (this.isOffScreen(screen)) {
       this.renderOffScreenMouseIndicator(mouse, screen);
@@ -84,6 +86,7 @@ export class MouseIndicatorsDirective implements AfterViewInit {
   }
 
   private getBoundaries(mouse: any): Screen {
+
     const rect = this.elemRef.nativeElement?.getBoundingClientRect();
     const width = rect!.width;
     const height = rect!.height;

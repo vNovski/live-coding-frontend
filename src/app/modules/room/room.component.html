@@ -10,6 +10,7 @@
       [otherSelection]="roomService.otherSelectionChange$ | async"
       [otherCursor]="roomService.otherCursorChange$ | async"
       [otherMouses]="(roomService.connections$ | async) || []"
+      [otherMouseMove]="(roomService.otherMouseMove$ | async) || []"
       [otherLog]="roomService.executionLog$ | async"
       (logsChange)="onLogsChange($event)"
       (change)="onChange($event)"
