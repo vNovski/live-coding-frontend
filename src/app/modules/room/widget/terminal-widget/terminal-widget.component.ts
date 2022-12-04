@@ -47,7 +47,6 @@ export class TerminalWidgetComponent implements OnInit, AfterViewInit, OnDestroy
   }
 
   @Input('editorChange') set editorChange(change: EditorChange) {
-    console.log('CHANGE')
     this.contentControl!.patchValue({ change }, { emitEvent: false })
   }
 

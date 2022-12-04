@@ -161,7 +161,6 @@ export class TerminalComponent implements AfterViewInit, OnDestroy, ControlValue
 
     this.value = cmVal;
     this.onChange({ value: this.value, change: change });
-    console.log('SEND');
   }
   setOptionIfChanged(optionName: string, newValue: any) {
     if (!this.codeMirror) {
