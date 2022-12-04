@@ -18,7 +18,6 @@ export class HeaderComponent implements OnInit {
   watchStatus = false;
 
   ngOnInit(): void {
-    this.openShortcutsDialog();
   }
 
 
