@@ -133,6 +133,12 @@ export class TerminalWidgetComponent implements OnInit, AfterViewInit, OnDestroy
     this.selectionChange.emit({ from: editor.getCursor('from'), to: editor.getCursor('to'), head: editor.getCursor('head') })
   }
 
+  focusChange(status: boolean) {
+    if(!status) {
+      this.cursorChange.emit({outside: 0});
+    }
+  }
+
   execute(): void {
     this.terminalWidgetService.eval(this.contentControl!.value.value).subscribe(log => {
       this.logsChange.emit(log);
@@ -188,12 +194,18 @@ export class TerminalWidgetComponent implements OnInit, AfterViewInit, OnDestroy
   }
 
   private renderOtherCursors(cursor: any): void {
+    console.log('cursor', cursor);
     if (cursor && this.editor.codeMirror) {
       const marker = this.cursorMarkers.get(cursor.color);
 
       if (marker) {
         marker.clear();
+
+        if(cursor.outside === 0) {
+          return;
+        }
       }
+
       const cursorCoords = this.editor.codeMirror.cursorCoords(cursor);
       const cursorElement = document.createElement('span');
       cursorElement.classList.add('other-cursor')

@@ -114,8 +114,8 @@ export class TerminalComponent implements AfterViewInit, OnDestroy, ControlValue
       this.codeMirror = await this.createEditor();
       this.codeMirror.on('cursorActivity', cm => this._ngZone.run(() => this.cursorActive(cm)));
       this.codeMirror.on('scroll', this.scrollChanged.bind(this));
-      this.codeMirror.on('blur', () => this._ngZone.run(() => this.focusChanged(false)));
-      this.codeMirror.on('focus', () => this._ngZone.run(() => this.focusChanged(true)));
+      this.codeMirror.on('blur', (cm) => this._ngZone.run(() => this.focusChanged(cm, false)));
+      this.codeMirror.on('focus', (cm) => this._ngZone.run(() => this.focusChanged(cm, true)));
       this.codeMirror.on('change', (cm, change) =>
         this._ngZone.run(() => {
           if(!this.ingoreNextChange) {
@@ -171,10 +171,15 @@ export class TerminalComponent implements AfterViewInit, OnDestroy, ControlValue
     // could possibly import settings strings available in the future
     this.codeMirror.setOption(optionName as any, newValue);
   }
-  focusChanged(focused: boolean) {
+  focusChanged(cm: Editor, focused: boolean) {
     this.onTouched();
     this.isFocused = focused;
-    this.focusChange.emit(focused);
+    if(!this.isFocused) {
+      this.focusChange.emit(focused);
+      return;
+    }
+
+    this.cursorActive(cm);
   }
   scrollChanged(cm: Editor) {
     this.scroll.emit(cm.getScrollInfo());

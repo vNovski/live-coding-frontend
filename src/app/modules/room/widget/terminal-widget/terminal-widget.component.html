@@ -7,6 +7,7 @@
             <div #terminalContainer class="terminal">
                 <form [formGroup]="terminalForm">
                     <app-terminal #editor formControlName="content"
+                        (focusChange)="focusChange($event)"
                         (cursorActivity)="onCursorActivity($event)"
                         (scroll)="onScrollChange($event)"></app-terminal>
                 </form>
