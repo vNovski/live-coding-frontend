@@ -12,7 +12,7 @@ import { MouseIndicatorsDirective } from './directives/mouse-indicators.directiv
   declarations: [
     TerminalWidgetComponent,
     HeaderComponent,
-    MouseIndicatorsDirective
+    MouseIndicatorsDirective,
   ],
   imports: [
     CommonModule,

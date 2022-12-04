@@ -1,7 +1,7 @@
 <div class="terminal-widget"
     [class.fullscreen]="fullscreenStatus"
    >
-   <app-terminal-widget-header (execute)="execute()" (toggleFullScreen)="toggleFullscreen($event)"></app-terminal-widget-header>
+   <app-terminal-widget-header (watch)="onWatch($event)" (execute)="execute()" (toggleFullScreen)="toggleFullscreen($event)"></app-terminal-widget-header>
     <div class="content-wrapper">
         <div #terminalWidget class="content"  [appMouseIndicators]="otherMouseMove" [activeMouses]="otherMouses">
             <div #terminalContainer class="terminal">

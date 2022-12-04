@@ -13,7 +13,7 @@ import {
   SkipSelf,
   ViewChild
 } from '@angular/core';
-import { BehaviorSubject, combineLatest, fromEvent, Subject, takeUntil, throttleTime } from 'rxjs';
+import { BehaviorSubject, combineLatest, debounceTime, filter, fromEvent, map, Subject, takeUntil, throttleTime } from 'rxjs';
 import { TerminalLogTypes } from 'src/app/shared/components/terminal/enums/terminal-log-types.enum';
 import { TerminalLog } from 'src/app/shared/components/terminal/interfaces/terminal-log.interface';
 import { LogService } from './services/log.service';
@@ -40,7 +40,7 @@ export class TerminalWidgetComponent implements OnInit, AfterViewInit, OnDestroy
 
 
   @Input('value') set value(data: { value: string }) {
-    if(isNill(data)) {
+    if (isNill(data)) {
       return
     }
     this.contentControl!.patchValue({ value: data.value }, { emitEvent: false });
@@ -62,7 +62,7 @@ export class TerminalWidgetComponent implements OnInit, AfterViewInit, OnDestroy
   @Input('otherMouseMove') otherMouseMove: any;
   @Input('otherMouses') otherMouses: string[] = [];
   @Input('otherLog') set otherLog(otherLog: TerminalLog) {
-    if(isNill(otherLog)) {
+    if (isNill(otherLog)) {
       return;
     }
     this.log(otherLog);
@@ -74,7 +74,7 @@ export class TerminalWidgetComponent implements OnInit, AfterViewInit, OnDestroy
   @Output() change = new EventEmitter<TerminalChange>();
   @Output() cursorChange = new EventEmitter<any>();
   @Output() selectionChange = new EventEmitter<{ from: any, to: any, head: any }>();
-  @Output() mouseMove = new EventEmitter<{ x: number | null, y: number | null } >();
+  @Output() mouseMove = new EventEmitter<{ x: number | null, y: number | null }>();
 
 
   terminalForm = this.fb.group({
@@ -82,6 +82,7 @@ export class TerminalWidgetComponent implements OnInit, AfterViewInit, OnDestroy
   });
 
   fullscreenStatus = false;
+  isWatchEnabled: boolean = false;
   otherMouseElements: Map<string, SVGElement> = new Map<string, SVGElement>();
 
   private selectionMarkers: Map<string, any> = new Map();
@@ -105,6 +106,7 @@ export class TerminalWidgetComponent implements OnInit, AfterViewInit, OnDestroy
 
   ngOnInit(): void {
     this.listenForm();
+    this.listenWatchForm();
     this.listenMouseMove();
   }
 
@@ -144,6 +146,10 @@ export class TerminalWidgetComponent implements OnInit, AfterViewInit, OnDestroy
 
   onScrollChange(event: any): void {
     this.scroll$.next(event);
+  }
+
+  onWatch(status: boolean): void {
+    this.isWatchEnabled = status;
   }
 
   private listenMouseMove() {
@@ -211,8 +217,21 @@ export class TerminalWidgetComponent implements OnInit, AfterViewInit, OnDestroy
     }
   }
 
+  private listenWatchForm(): void {
+    this.terminalForm.valueChanges.pipe(
+      debounceTime(3000),
+      takeUntil(this.ngUnsubscribe),
+      filter(() => this.isWatchEnabled)
+    ).subscribe(() => {
+      this.execute();
+    });
+  }
+
   private listenForm() {
-    this.terminalForm.valueChanges.pipe(takeUntil(this.ngUnsubscribe)).subscribe(({ content } : { content: TerminalChange }) => {
+    this.terminalForm.valueChanges.pipe(
+      throttleTime(100),
+      takeUntil(this.ngUnsubscribe),
+    ).subscribe(({ content }: { content: TerminalChange }) => {
       this.change.emit(content);
     });
   }
