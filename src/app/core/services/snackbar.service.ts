@@ -19,11 +19,6 @@ export class SnackbarService {
 
 
   open(message: string, action = '', options: MatSnackBarConfig = {}): MatSnackBarRef<TextOnlySnackBar> {
-    console.log('config', {
-      ...this.config,
-      ...options,
-      panelClass: [...this.config.panelClass, ...(options.panelClass || [])],
-    })
     return this.snackBar.open(message, action, {
       ...this.config,
       ...options,

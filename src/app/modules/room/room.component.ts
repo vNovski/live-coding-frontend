@@ -49,7 +49,7 @@ export class RoomComponent implements OnInit, OnDestroy {
     this.route.params.subscribe(params => {
       const id = params['id'];
       this.roomId = id;
-      this.socketService.emit(RoomEvents.join, id);
+      this.roomService.joinRoom(id);
     });
   }
 

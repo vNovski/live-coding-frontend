@@ -35,8 +35,11 @@ export class MouseIndicatorsDirective implements AfterViewInit {
     [...this.mouseElements.keys()].forEach(id => {
       if (!activeMouses.includes(id)) {
         this.renderer.removeChild(this.editorScroll, this.mouseElements.get(id));
-        this.mouseElements.delete(id)
-        this.renderer.removeChild(this.elemRef, this.offScreenIndicatorElements.get(id));
+        this.mouseElements.delete(id);
+        const offScreenIndicatorEl = this.offScreenIndicatorElements.get(id);
+        if(offScreenIndicatorEl) {
+          this.renderer.removeChild(this.elemRef, offScreenIndicatorEl);
+        }
         this.offScreenIndicatorElements.delete(id)
       }
     })

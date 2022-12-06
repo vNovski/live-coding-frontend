@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { BehaviorSubject, map, Observable, tap } from 'rxjs';
 import { SnackbarService } from 'src/app/core/services/snackbar.service';
 import { SocketService } from 'src/app/core/services/socket/socket.service';
 import { UserService } from 'src/app/core/services/user/user.service';
@@ -19,7 +19,7 @@ export class RoomService {
   public connect$ = this.socketService.on(RoomEvents.join);
   public disconnect$ = this.socketService.on(RoomEvents.leave);
   public initialConnections$ = this.socketService.on(RoomEvents.shareConnections);
-  
+
   public otherCursorChange$ = this.socketService.on(TermianlEvents.cursorChange);
   public otherSelectionChange$ = this.socketService.on(TermianlEvents.selectionChange);
   public executionLog$ = this.socketService.on(TermianlEvents.executionLog);
@@ -41,18 +41,6 @@ export class RoomService {
     this.init();
     this.listenForConnect();
     this.listenForDisconnect();
-    this.snackBar.open('User connected', '', {
-      duration: 2000,
-      verticalPosition: 'bottom',
-      horizontalPosition: 'right',
-      panelClass: 'snackbar'
-    })
-    this.snackBar.open('User connected', '', {
-      duration: 2000,
-      verticalPosition: 'bottom',
-      horizontalPosition: 'right',
-      panelClass: 'snackbar'
-    })
   }
 
   private init(): void {
@@ -64,15 +52,9 @@ export class RoomService {
   private listenForConnect(): void {
     this.connect$.pipe(
       tap(() => {
-    // this.snackBar.openFromComponent(ConnectionSnackbarComponent, { duration: undefined, data: { color: '#ccc', connected: true  } })
-
-        this.snackBar.open('User connected', '', {
-          duration: 2000,
-          verticalPosition: 'bottom',
-          horizontalPosition: 'right',
-          panelClass: 'snackbar'
-        })
-      })
+        this.snackBar.open('User Connected', '', { panelClass: ['info'] })
+      }),
+      map(({ userId }) => userId)
     ).subscribe((userId: string) => {
       this._connections$.next([...this._connections$.getValue(), userId])
     })
@@ -81,7 +63,7 @@ export class RoomService {
   private listenForDisconnect(): void {
     this.disconnect$.pipe(
       tap(() => {
-        this.snackBar.open('User disconnected', '', {panelClass: ['info']})
+        this.snackBar.open('User disconnected', '', { panelClass: ['info'] })
       })
     ).subscribe((userId: string) => {
       this._connections$.next(this._connections$.getValue().filter(id => id !== userId))
@@ -94,6 +76,10 @@ export class RoomService {
 
   leaveRoom(): void {
     this.socketService.emit(RoomEvents.leave, this.id);
+  }
+
+  joinRoom(id: string): void {
+    this.socketService.emit(RoomEvents.join, id);
   }
 
   mouseMove(position: any): void {
