@@ -3,6 +3,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { ConnectionsService, RoomEvents } from 'src/app/core/services/connections/connections.service';
+import { SnackbarService } from 'src/app/core/services/snackbar.service';
 import { CommunicationEventTypes, SocketService } from 'src/app/core/services/socket/socket.service';
 import { UserService } from 'src/app/core/services/user/user.service';
 import { TerminalLog } from 'src/app/shared/components/terminal/interfaces/terminal-log.interface';
@@ -11,7 +12,7 @@ import { TermianlEvents } from './widget/enums/terminal-events.enum';
 import { TerminalChange } from './widget/terminal-widget/interfaces/terminal-change.interface';
 
 
-function roomServiceFactory(route: ActivatedRoute, userService: UserService, socketService: SocketService, snackBar: MatSnackBar) {
+function roomServiceFactory(route: ActivatedRoute, userService: UserService, socketService: SocketService, snackBar: SnackbarService) {
   // TODO: check if id exists via GUARD
   return new RoomService(route.snapshot.paramMap.get('id')!, userService, socketService, snackBar);
 }
@@ -24,7 +25,7 @@ function roomServiceFactory(route: ActivatedRoute, userService: UserService, soc
   providers: [{
     provide: RoomService,
     useFactory: roomServiceFactory,
-    deps: [ActivatedRoute, UserService, SocketService, MatSnackBar]
+    deps: [ActivatedRoute, UserService, SocketService, SnackbarService]
   }]
 })
 export class RoomComponent implements OnInit, OnDestroy {

@@ -1,0 +1,19 @@
+.snackbar {
+    border-radius: 12px;
+
+    &.success {
+        background: var(--success-color);
+    }
+
+    &.error {
+        background: var(--error-color);
+    }
+
+    &.warn {
+        background: var(--warn-color);
+    }
+
+    &.info {
+        background: var(--info-color);
+    }
+}

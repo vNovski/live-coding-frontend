@@ -4,10 +4,11 @@ import { TerminalLog } from 'src/app/shared/components/terminal/interfaces/termi
 import { TermianlEvents } from '../../enums/terminal-events.enum';
 import { catchError, filter, map, switchMap, takeUntil, tap } from 'rxjs/operators';
 import { fromEvent, Observable, throwError, timer, of } from 'rxjs';
+import { SnackbarService } from 'src/app/core/services/snackbar.service';
 
 @Injectable()
 export class TerminalWidgetService {
-  constructor() {
+  constructor(private readonly snackBar: SnackbarService) {
   }
 
   eval(code: string): Observable<TerminalLog> {
@@ -33,6 +34,11 @@ export class TerminalWidgetService {
     return message$.pipe(
       takeUntil(successMessage$),
       takeUntil(timeoutClose$),
+      tap(() => {
+        this.snackBar.open('Compiled', '', {
+          panelClass: ['success'],
+        })
+      }),
       catchError((error: Error): Observable<TerminalLog> => of({ type: 'error', data: [error.message] }))
     )
   }

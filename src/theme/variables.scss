@@ -1,4 +1,13 @@
-$background: #25252D;
+:root {
+    --success-color: #2D884D;
+    --error-color: #B34045;
+    --warn-color: #FECF6D;
+    --info-color: #263238;
+    --background-color: #25252D;
+    --text-color: #ccc;
+    --container-background-color: #263238;
+    --shadow: 0 0 7px 0 #00000091;
+    --transition: all .5s ease-in-out
 
-$default-transition: all .5s ease-in-out;
-$default-shadow: 0 0 7px 0 #00000091;
+
+}

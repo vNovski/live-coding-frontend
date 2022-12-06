@@ -1,12 +1,12 @@
 @import "../../../../../../../theme/index.scss";
 
 ::ng-deep .settings-menu {
-    background: #263238;
+    background: var(--container-background-color);
     border-radius: 12px !important;
     margin-top: 4px;
 
     button {
-        color: #ccc !important;
+        color: var(--text-color) !important;
         font-weight: 500;
 
         mat-icon {
@@ -19,7 +19,7 @@
 
 ::ng-deep .shortcuts-dialog {
     .mat-dialog-container {
-        background-color: $background;
+        background-color: var(--background-color);
         margin: 0;
         padding: 0;
     }
@@ -58,29 +58,29 @@
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    background: $background;
+    background: var(--background-color);
 
     .controls {
         z-index: 5;
-        transition: $default-transition;
+        transition: var(--transition);
     }
 
     button {
         transition: all 0.2s ease-in-out;
         box-shadow: 0 0 5px 0 #00000091;
-        background: #263238;
+        background: var(--container-background-color);
 
         &:not(:last-of-type) {
             margin-right: 10px;
         }
 
         &:hover {
-            box-shadow: $default-shadow;
+            box-shadow: var(--shadow);
             filter: brightness(1.1);
         }
 
         &:active {
-            box-shadow: inset $default-shadow;
+            box-shadow: inset var(--shadow);
         }
 
         &.execute-btn {
@@ -96,10 +96,10 @@
         }
 
         &.settings-btn {
-            transition: $default-transition;
+            transition: var(--transition);
 
             mat-icon {
-                transition: $default-transition;
+                transition: var(--transition);
             }
 
             &:hover {
@@ -109,7 +109,7 @@
             }
 
             &:active {
-                box-shadow: inset $default-shadow;
+                box-shadow: inset var(--shadow);
                 filter: brightness(1);
             }
         }

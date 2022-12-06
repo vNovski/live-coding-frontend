@@ -17,8 +17,8 @@
 
 .logout-btn {
     transform: scale(-1);
-    transition: $default-transition;
-    box-shadow: inset $default-shadow;
+    transition: var(--transition);
+    box-shadow: inset var(--shadow);
     position: absolute;
     top: 1rem;
     left: 1rem;

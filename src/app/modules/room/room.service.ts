@@ -1,8 +1,10 @@
 import { Inject, Injectable } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { SnackbarService } from 'src/app/core/services/snackbar.service';
 import { SocketService } from 'src/app/core/services/socket/socket.service';
 import { UserService } from 'src/app/core/services/user/user.service';
+import { ConnectionSnackbarComponent } from 'src/app/shared/components/connection-snackbar/connection-snackbar.component';
 import { TerminalLog } from 'src/app/shared/components/terminal/interfaces/terminal-log.interface';
 import { RoomEvents } from './enums/room-events.enum';
 import { RoomModule } from './room.module';
@@ -33,12 +35,24 @@ export class RoomService {
     @Inject('id') id: string,
     private readonly userService: UserService,
     private readonly socketService: SocketService,
-    private readonly snackBar: MatSnackBar
+    private readonly snackBar: SnackbarService
   ) {
     this.id = id;
     this.init();
     this.listenForConnect();
     this.listenForDisconnect();
+    this.snackBar.open('User connected', '', {
+      duration: 2000,
+      verticalPosition: 'bottom',
+      horizontalPosition: 'right',
+      panelClass: 'snackbar'
+    })
+    this.snackBar.open('User connected', '', {
+      duration: 2000,
+      verticalPosition: 'bottom',
+      horizontalPosition: 'right',
+      panelClass: 'snackbar'
+    })
   }
 
   private init(): void {
@@ -50,6 +64,8 @@ export class RoomService {
   private listenForConnect(): void {
     this.connect$.pipe(
       tap(() => {
+    // this.snackBar.openFromComponent(ConnectionSnackbarComponent, { duration: undefined, data: { color: '#ccc', connected: true  } })
+
         this.snackBar.open('User connected', '', {
           duration: 2000,
           verticalPosition: 'bottom',
@@ -65,12 +81,7 @@ export class RoomService {
   private listenForDisconnect(): void {
     this.disconnect$.pipe(
       tap(() => {
-        this.snackBar.open('User disconnected', '', {
-          duration: 2000,
-          verticalPosition: 'bottom',
-          horizontalPosition: 'right',
-          panelClass: 'snackbar'
-        })
+        this.snackBar.open('User disconnected', '', {panelClass: ['info']})
       })
     ).subscribe((userId: string) => {
       this._connections$.next(this._connections$.getValue().filter(id => id !== userId))

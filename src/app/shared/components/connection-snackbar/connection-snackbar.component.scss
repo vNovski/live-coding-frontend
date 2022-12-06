@@ -1,0 +1,14 @@
+    .connection-indicator {
+      display: block;
+      display: flex;
+      align-items: center;
+    }
+
+    .circle {
+        display: block;
+        margin-right: 10px;
+        width: 12px;
+        height: 12px;
+        border-radius: 100%;
+        background: red;
+    }

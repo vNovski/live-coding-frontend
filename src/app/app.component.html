@@ -1,3 +1,5 @@
 
-  <router-outlet></router-outlet>
-  <span class="octicon">© {{year}} Vlad N.</span>
+<main [@routerTransition]="getState(o)">
+  <router-outlet #o="outlet"></router-outlet>
+</main>
+<span class="octicon">© {{year}} Vlad N.</span>

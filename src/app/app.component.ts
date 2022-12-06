@@ -1,23 +1,20 @@
 import { Component } from '@angular/core';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { Position } from 'codemirror';
-import { Socket } from 'ngx-socket-io';
-import { ConnectionsService } from './core/services/connections/connections.service';
-import { CommunicationEventTypes, SocketService } from './core/services/socket/socket.service';
-import { UserService } from './core/services/user/user.service';
-import { FormBuilder } from '@angular/forms';
+import { routerTransition } from './routing-animations';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+  styleUrls: ['./app.component.scss'],
+  animations: [ routerTransition ]
 })
 export class AppComponent {
   year = new Date().getFullYear();
-  form = this.fb.group({
-    content: ``
-  });
 
-  constructor(    private readonly fb: FormBuilder,) {
+  constructor() {}
+
+  getState(outlet: any) {
+    return outlet && 
+    outlet.activatedRouteData && 
+    outlet.activatedRouteData['state'];
   }
 }

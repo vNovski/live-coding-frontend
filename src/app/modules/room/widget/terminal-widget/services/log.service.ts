@@ -6,18 +6,23 @@ export class LogService {
   constructor() { }
 
   error(attrs: any[]): void {
-    console.error(...attrs);
+   
+    this.container(console.error.bind(this, ...attrs));
   }
   warn(attrs: any[]): void {
-    console.warn(...attrs);
+    this.container(console.warn.bind(this, ...attrs));
   }
 
   info(attrs: any[]): void {
-    console.info(...attrs);
+    this.container(console.info.bind(this, ...attrs));
   }
 
   log(attrs: any[]): void {
-    console.log(...attrs);
+    this.container(console.log.bind(this, ...attrs));
+  }
+
+  private container(fn: Function) {
+    fn();
   }
 
 

@@ -1,7 +1,7 @@
 @import "../../../../../../../theme/index.scss";
 
 code {
-    background: #263238;
+    background: var(--container-background-color);
     border: 1px solid #3d4950;
     padding: 5px;
 }
@@ -20,7 +20,7 @@ code {
 
 .shortcuts {
     width: 100%;
-    background: $background;
+    background: var(--background-color);
 
     th {
         font-weight: bold;
@@ -29,6 +29,6 @@ code {
 
     th,
     td {
-        color: #ccc;
+        color: var(--text-color);
     }
 }

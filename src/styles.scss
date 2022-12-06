@@ -47,7 +47,7 @@
 
 html,
 body {
-    background: $background;
+    background: var(--background-color);
     font-family: sans-serif;
     height: 100%;
 }
@@ -65,11 +65,6 @@ pre[class*="language-"].line-numbers>code {
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
-.snackbar {
-    border-radius: 12px;
-    background: #263238;
-}
-
  .mat-slide-toggle.mat-checked:not(.mat-disabled) .mat-slide-toggle-bar {
     background-color: #3d5a67;
 }
@@ -78,7 +73,7 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 }
 
 .mat-slide-toggle .mat-slide-toggle-thumb {
-    background-color: #ccc;
+    background-color: var(--text-color);
 }
  .mat-slide-toggle.mat-checked .mat-ripple-element {
     background-color: #546E7A;
