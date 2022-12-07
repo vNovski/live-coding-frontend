@@ -120,8 +120,8 @@ export class TerminalComponent implements AfterViewInit, OnDestroy, ControlValue
         this._ngZone.run(() => {
           if(!this.ingoreNextChange) {
             this.codemirrorValueChanged(cm, change);
-            this.ingoreNextChange = false;
-          }
+          } 
+          this.ingoreNextChange = false;
         }),
       );
       this.codeMirror.on('drop', (cm, e) => {
