@@ -222,7 +222,6 @@ export class TerminalComponent implements AfterViewInit, OnDestroy, ControlValue
 
     if (!isNill(change)) {
       this.lastChange = change;
-      console.log('received')
       this.codeMirror.replaceRange(change.text, change.from, change.to, '+ignore')
     }
   }
