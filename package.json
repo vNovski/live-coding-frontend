@@ -25,7 +25,9 @@
     "codemirror": "^5.56.0",
     "js-beautify": "^1.14.7",
     "ngx-socket-io": "^3.2.0",
+    "node-sass": "^8.0.0",
     "rxjs": "~7.5.0",
+    "sass": "^1.56.2",
     "socket.io-client": "^4.5.3",
     "tslib": "^2.3.0",
     "zone.js": "~0.11.4"
