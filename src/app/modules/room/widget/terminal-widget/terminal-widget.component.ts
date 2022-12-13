@@ -43,12 +43,10 @@ export class TerminalWidgetComponent implements OnInit, AfterViewInit, OnDestroy
     if (isNill(data)) {
       return
     }
-    this.contentControl!.patchValue({ value: data.value }, { emitEvent: false });
+    this.contentControl!.patchValue(data.value, { emitEvent: false });
   }
 
-  @Input('editorChange') set editorChange(change: EditorChange) {
-    this.contentControl!.patchValue({ change }, { emitEvent: false })
-  }
+  @Input('editorChange') editorChange: EditorChange | null = null;
 
 
   @Input('otherSelection') set otherSelection(selection: any) {
@@ -78,7 +76,7 @@ export class TerminalWidgetComponent implements OnInit, AfterViewInit, OnDestroy
 
 
   terminalForm = this.fb.group({
-    content: { value: '', change: null }
+    content: ''
   });
 
   fullscreenStatus = false;
@@ -88,6 +86,7 @@ export class TerminalWidgetComponent implements OnInit, AfterViewInit, OnDestroy
   private selectionMarkers: Map<string, any> = new Map();
   private cursorMarkers: Map<string, any> = new Map();
   private ngUnsubscribe: Subject<void> = new Subject<void>();
+
 
   private scroll$: BehaviorSubject<{ left: number, top: number }> = new BehaviorSubject<{ left: number, top: number }>({ left: 0, top: 0 });
 

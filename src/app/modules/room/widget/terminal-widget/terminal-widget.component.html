@@ -1,12 +1,14 @@
 <div class="terminal-widget"
-    [class.fullscreen]="fullscreenStatus"
-   >
-   <app-terminal-widget-header (watch)="onWatch($event)" (execute)="execute()" (toggleFullScreen)="toggleFullscreen($event)"></app-terminal-widget-header>
+    [class.fullscreen]="fullscreenStatus">
+    <app-terminal-widget-header (watch)="onWatch($event)" (execute)="execute()"
+        (toggleFullScreen)="toggleFullscreen($event)"></app-terminal-widget-header>
     <div class="content-wrapper">
-        <div #terminalWidget class="content"  [appMouseIndicators]="otherMouseMove" [activeMouses]="otherMouses">
+        <div #terminalWidget class="content"
+            [appMouseIndicators]="otherMouseMove" [activeMouses]="otherMouses">
             <div #terminalContainer class="terminal">
                 <form [formGroup]="terminalForm">
                     <app-terminal #editor formControlName="content"
+                        [change]="editorChange"
                         (focusChange)="focusChange($event)"
                         (cursorActivity)="onCursorActivity($event)"
                         (scroll)="onScrollChange($event)"></app-terminal>

@@ -54,6 +54,13 @@ export class TerminalComponent implements AfterViewInit, OnDestroy, ControlValue
   /* autofocus setting applied to the created textarea */
   @Input() autoFocus = true;
 
+  @Input() set change(change: EditorChange | null) {
+    if(isNill(change)) {
+      return;
+    }
+    this.applyChange(change!);
+  };
+
   /**
    * set options for codemirror
    * @link http://codemirror.net/doc/manual.html#config
@@ -89,12 +96,14 @@ export class TerminalComponent implements AfterViewInit, OnDestroy, ControlValue
    * either global variable or required library
    */
   private _codeMirror: any;
+  private initialChange = false;
 
   private _differ?: KeyValueDiffer<string, any>;
   private _options: any = {
     lineNumbers: true,
     theme: 'material',
-    mode: 'javascript'
+    mode: 'javascript',
+    indentUnit: 2
   };
 
   constructor(private _differs: KeyValueDiffers, private _ngZone: NgZone) { }
@@ -121,7 +130,6 @@ export class TerminalComponent implements AfterViewInit, OnDestroy, ControlValue
           if(change.origin === '+ignore') {
             return;
           }
-          console.log(change.origin, 'origin')
           this.codemirrorValueChanged(cm, change);
         }),
       );
@@ -156,7 +164,8 @@ export class TerminalComponent implements AfterViewInit, OnDestroy, ControlValue
   codemirrorValueChanged(cm: Editor, change: EditorChange) {
     const cmVal = cm.getValue();
 
-    if (this.value === cmVal || JSON.stringify(this.lastChange) === JSON.stringify(change)) {
+    if(!this.initialChange) {
+      this.initialChange = true;
       return;
     }
 
@@ -193,9 +202,8 @@ export class TerminalComponent implements AfterViewInit, OnDestroy, ControlValue
   }
 
   /** Implemented as part of ControlValueAccessor. */
-  writeValue(content: { value: string, change: any }) {
-    const { value, change } = content;
-    if (isNill(value) && isNill(change)) {
+  writeValue(value: string) {
+    if (isNill(value)) {
       return;
     }
 
@@ -220,9 +228,13 @@ export class TerminalComponent implements AfterViewInit, OnDestroy, ControlValue
       this.codeMirror.setValue(value);
     }
 
-    if (!isNill(change)) {
+  }
+
+  private applyChange(change: EditorChange): void {
+    if (!isNill(change) && this.codeMirror) {
       this.lastChange = change;
-      this.codeMirror.replaceRange(change.text, change.from, change.to, '+ignore')
+      this.codeMirror.replaceRange(change.text, change.from, change.to, '+ignore');
+      this.value = this.codeMirror.getValue();
     }
   }
 
