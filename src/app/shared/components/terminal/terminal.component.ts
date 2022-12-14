@@ -102,7 +102,7 @@ export class TerminalComponent implements AfterViewInit, OnDestroy, ControlValue
   private _options: any = {
     lineNumbers: true,
     theme: 'material',
-    mode: 'javascript',
+    mode: 'text/typescript',
     indentUnit: 2
   };
 

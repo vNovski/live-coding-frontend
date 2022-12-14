@@ -5,6 +5,7 @@ import { TermianlEvents } from '../../enums/terminal-events.enum';
 import { catchError, filter, map, switchMap, takeUntil, tap } from 'rxjs/operators';
 import { fromEvent, Observable, throwError, timer, of } from 'rxjs';
 import { SnackbarService } from 'src/app/core/services/snackbar.service';
+import { transpileModule, ModuleKind } from 'typescript'
 
 @Injectable()
 export class TerminalWidgetService {
@@ -12,7 +13,8 @@ export class TerminalWidgetService {
   }
 
   eval(code: string): Observable<TerminalLog> {
-    const worker = new Worker(this.getCodeBlob(code));
+    let { outputText: jsCode }  = transpileModule(code, { compilerOptions: { module: ModuleKind.CommonJS, allowJs: true }});
+    const worker = new Worker(this.getCodeBlob(jsCode));
 
     const message$ = fromEvent<MessageEvent>(worker, 'message')
       .pipe(map(e => <TerminalLog>JSON.parse(e.data)));
@@ -66,7 +68,7 @@ export class TerminalWidgetService {
             //with (sandboxProxy) {
                 (function() {
                     try {
-                        ${ codeToInject };
+                        ${codeToInject};
                     } catch (e) {
                         console.error(e);
                     }
