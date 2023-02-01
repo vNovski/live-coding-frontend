@@ -56,8 +56,8 @@ export class TerminalWidgetService {
             const nativePostMessage = this.postMessage;
             
             ['log', 'info', 'warn', 'error'].forEach(patchConsoleMethod);
-            
-            // const sandboxProxy = new Proxy(Object.assign(unitApi, apis), {has, get});
+            w Proxy
+            // const sandboxProxy = ne(Object.assign(unitApi, apis), {has, get});
             
             // Object.keys(this).forEach(key => {
             //     delete this[key];
@@ -112,7 +112,6 @@ export class TerminalWidgetService {
 
   private getCodeBlob(code: string): any {
     const blob = new Blob([this.getWorkerCode(code)], { type: "text/javascript" });
-
     return URL.createObjectURL(blob);
   }
 }
