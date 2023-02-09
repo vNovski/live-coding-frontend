@@ -13,7 +13,7 @@
       [otherMouseMove]="(roomService.otherMouseMove$ | async) || []"
       [otherLog]="roomService.executionLog$ | async"
       (logsChange)="onLogsChange($event)"
-      (change)="onChange($event)"
+      (edit)="onChange($event)"
       (cursorChange)="onCursorChange($event)"
       (selectionChange)="onSelectionChange($event)"
       (mouseMove)="onMouseMove($event)"

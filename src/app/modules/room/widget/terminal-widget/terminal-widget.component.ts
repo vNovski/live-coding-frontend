@@ -69,7 +69,7 @@ export class TerminalWidgetComponent implements OnInit, AfterViewInit, OnDestroy
 
   @Output() fullscreenChange = new EventEmitter<boolean>();
   @Output() logsChange = new EventEmitter<TerminalLog>();
-  @Output() change = new EventEmitter<TerminalChange>();
+  @Output() edit = new EventEmitter<TerminalChange>();
   @Output() cursorChange = new EventEmitter<any>();
   @Output() selectionChange = new EventEmitter<{ from: any, to: any, head: any }>();
   @Output() mouseMove = new EventEmitter<{ x: number | null, y: number | null }>();
@@ -241,7 +241,7 @@ export class TerminalWidgetComponent implements OnInit, AfterViewInit, OnDestroy
     this.terminalForm.valueChanges.pipe(
       takeUntil(this.ngUnsubscribe),
     ).subscribe(({ content }: { content: TerminalChange }) => {
-      this.change.emit(content);
+      this.edit.emit(content);
     });
   }
 
