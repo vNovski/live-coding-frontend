@@ -56,8 +56,7 @@ export class TerminalWidgetService {
             const nativePostMessage = this.postMessage;
             
             ['log', 'info', 'warn', 'error'].forEach(patchConsoleMethod);
-            w Proxy
-            // const sandboxProxy = ne(Object.assign(unitApi, apis), {has, get});
+            // const sandboxProxy = new Proxy(Object.assign(unitApi, apis), {has, get});
             
             // Object.keys(this).forEach(key => {
             //     delete this[key];
