@@ -1,9 +1,20 @@
 import { Inject, Injectable } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { BehaviorSubject, map, Observable, tap } from 'rxjs';
+import {
+  BehaviorSubject,
+  filter,
+  map,
+  Observable,
+  take,
+  tap,
+  withLatestFrom,
+} from 'rxjs';
 import { SnackbarService } from 'src/app/core/services/snackbar.service';
 import { SocketService } from 'src/app/core/services/socket/socket.service';
-import { UserService } from 'src/app/core/services/user/user.service';
+import {
+  IUserInfo as IUser,
+  UserService,
+} from 'src/app/core/services/user/user.service';
 import { ConnectionSnackbarComponent } from 'src/app/shared/components/connection-snackbar/connection-snackbar.component';
 import { TerminalLog } from 'src/app/shared/components/terminal/interfaces/terminal-log.interface';
 import { RoomEvents } from './enums/room-events.enum';
@@ -14,20 +25,51 @@ import { TerminalChange } from './widget/terminal-widget/interfaces/terminal-cha
 @Injectable()
 export class RoomService {
   id: string;
-  public _connections$: BehaviorSubject<string[]> = new BehaviorSubject<string[]>([]);
+  public _connections$: BehaviorSubject<IUser[]> = new BehaviorSubject<IUser[]>(
+    []
+  );
 
   public connect$ = this.socketService.on(RoomEvents.join);
   public disconnect$ = this.socketService.on(RoomEvents.leave);
-  public initialConnections$ = this.socketService.on(RoomEvents.shareConnections);
+  public initialConnections$ = this.socketService.on(
+    RoomEvents.shareConnections
+  );
 
-  public otherCursorChange$ = this.socketService.on(TermianlEvents.cursorChange);
-  public otherSelectionChange$ = this.socketService.on(TermianlEvents.selectionChange);
+  public otherCursorChange$ = this.socketService
+    .on(TermianlEvents.cursorChange)
+    .pipe(
+      withLatestFrom(this.connections$),
+      map(([cursor, users]) => ({
+        ...users.find((user) => user.id === cursor.userId),
+        ...cursor.position,
+      }))
+    );
+
+  public otherSelectionChange$ = this.socketService
+    .on(TermianlEvents.selectionChange)
+    .pipe(
+      withLatestFrom(this.connections$),
+      map(([selection, users]) => ({
+        ...users.find((user) => user.id === selection.userId),
+        ...selection.position,
+      }))
+    );
+
   public executionLog$ = this.socketService.on(TermianlEvents.executionLog);
   public otherChanged$ = this.socketService.on(TermianlEvents.change);
-  public otherMouseMove$ = this.socketService.on(TermianlEvents.mouseMove);
-  public initialState$ = this.socketService.on(TermianlEvents.shareState);
 
-  get connections$(): Observable<string[]> {
+  public otherMouseMove$ = this.socketService.on(TermianlEvents.mouseMove).pipe(
+    withLatestFrom(this.connections$),
+    map(([mouse, users]) => ({
+      ...users.find((user) => user.id === mouse.userId),
+      ...mouse.position,
+    }))
+  );
+
+  public initialState$ = this.socketService.on(TermianlEvents.shareState);
+  public available$ = this.socketService.available$;
+
+  get connections$(): Observable<IUser[]> {
     return this._connections$.asObservable();
   }
 
@@ -44,58 +86,94 @@ export class RoomService {
   }
 
   private init(): void {
-    this.initialConnections$.subscribe((userIds) => {
-      this._connections$.next(userIds);
-    })
+    this.initialConnections$.subscribe((users: IUser[]) => {
+      this._connections$.next(users);
+    });
+
+    this.socketService.id$
+      .pipe(
+        filter((id) => !!id),
+        take(1)
+      )
+      .subscribe((userId: string) => {
+        this.userService.setId(userId);
+      });
   }
 
   private listenForConnect(): void {
-    this.connect$.pipe(
-      tap(() => {
-        this.snackBar.open('User Connected', '', { panelClass: ['info'] })
-      }),
-      map(({ userId }) => userId)
-    ).subscribe((userId: string) => {
-      this._connections$.next([...this._connections$.getValue(), userId])
-    })
+    this.connect$
+      .pipe(
+        tap((user: IUser) => {
+          this.snackBar.open(`${user.username}: Connected`, '', {
+            panelClass: ['info'],
+          });
+        })
+      )
+      .subscribe((user: IUser) => {
+        this._connections$.next([...this._connections$.getValue(), user]);
+      });
   }
 
   private listenForDisconnect(): void {
-    this.disconnect$.pipe(
-      tap(() => {
-        this.snackBar.open('User disconnected', '', { panelClass: ['info'] })
-      })
-    ).subscribe((userId: string) => {
-      this._connections$.next(this._connections$.getValue().filter(id => id !== userId))
-    })
+    this.disconnect$
+      .pipe(
+        tap(() => {
+          this.snackBar.open('User disconnected', '', { panelClass: ['info'] });
+        })
+      )
+      .subscribe((userId: string) => {
+        this._connections$.next(
+          this._connections$.getValue().filter(({ id }) => id !== userId)
+        );
+      });
   }
 
   shareExecutionLog(log: TerminalLog) {
-    this.socketService.emit(TermianlEvents.executionLog, { roomId: this.id, data: log })
+    this.socketService.emit(TermianlEvents.executionLog, {
+      roomId: this.id,
+      data: log,
+    });
   }
 
   leaveRoom(): void {
     this.socketService.emit(RoomEvents.leave, this.id);
   }
 
-  joinRoom(id: string): void {
-    this.socketService.emit(RoomEvents.join, id);
+  joinRoom(): void {
+    const userInfo = this.userService.getInfo();
+    if (userInfo) {
+      this.socketService.emit(RoomEvents.join, {
+        roomId: this.id,
+        user: userInfo,
+      });
+    }
   }
 
   mouseMove(position: any): void {
-    this.socketService.emit(TermianlEvents.mouseMove, { roomId: this.id, data: { color: this.userService.color, ...position } });
+    this.socketService.emit(TermianlEvents.mouseMove, {
+      roomId: this.id,
+      position,
+    });
   }
 
   cursorChange(position: any): void {
-    this.socketService.emit(TermianlEvents.cursorChange, { roomId: this.id, data: { color: this.userService.color, ...position } });
+    this.socketService.emit(TermianlEvents.cursorChange, {
+      roomId: this.id,
+      position,
+    });
   }
 
   selectionChange(position: any): void {
-    this.socketService.emit(TermianlEvents.selectionChange, { roomId: this.id, data: { color: this.userService.color, ...position } });
+    this.socketService.emit(TermianlEvents.selectionChange, {
+      roomId: this.id,
+      position,
+    });
   }
 
-
   terminalChanged(change: TerminalChange): void {
-    this.socketService.emit(TermianlEvents.change, { roomId: this.id, data: change });
+    this.socketService.emit(TermianlEvents.change, {
+      roomId: this.id,
+      data: change,
+    });
   }
 }

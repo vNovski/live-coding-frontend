@@ -75,7 +75,7 @@ export class MouseIndicatorsDirective implements AfterViewInit {
       const mouseEl = this.mouseElements.get(userId);
       this.renderer.setStyle(mouseEl, 'fill', color);
       this.renderer.setStyle(mouseEl, 'display', x && y ? 'block' : 'none');
-      this.renderer.setStyle(mouseEl, 'top', y);
+      this.renderer.setStyle(mouseEl, 'top', y - 10); // 10px is a size of mouse icon
       this.renderer.setStyle(mouseEl, 'left', x);
       return;
     }

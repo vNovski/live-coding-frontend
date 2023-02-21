@@ -2,33 +2,49 @@ import { Injectable } from '@angular/core';
 import { SocketService } from 'src/app/core/services/socket/socket.service';
 import { TerminalLog } from 'src/app/shared/components/terminal/interfaces/terminal-log.interface';
 import { TermianlEvents } from '../../enums/terminal-events.enum';
-import { catchError, filter, map, switchMap, takeUntil, tap } from 'rxjs/operators';
+import {
+  catchError,
+  filter,
+  finalize,
+  map,
+  switchMap,
+  takeUntil,
+  tap,
+} from 'rxjs/operators';
 import { fromEvent, Observable, throwError, timer, of } from 'rxjs';
 import { SnackbarService } from 'src/app/core/services/snackbar.service';
-import { transpileModule, ModuleKind } from 'typescript'
+import { transpileModule, ModuleKind } from 'typescript';
 
 @Injectable()
 export class TerminalWidgetService {
-  constructor(private readonly snackBar: SnackbarService) {
-  }
+  constructor(private readonly snackBar: SnackbarService) {}
 
   eval(code: string): Observable<TerminalLog> {
-    let { outputText: jsCode }  = transpileModule(code, { compilerOptions: { module: ModuleKind.CommonJS, allowJs: true }});
+    let { outputText: jsCode } = transpileModule(code, {
+      compilerOptions: { module: ModuleKind.CommonJS, allowJs: true },
+    });
     const worker = new Worker(this.getCodeBlob(jsCode));
 
-    const message$ = fromEvent<MessageEvent>(worker, 'message')
-      .pipe(map(e => <TerminalLog>JSON.parse(e.data)));
+    const message$ = fromEvent<MessageEvent>(worker, 'message').pipe(
+      map((e) => <TerminalLog>JSON.parse(e.data))
+    );
 
-    const successMessage$ = message$
-      .pipe(
-        filter(({ type }) => type === 'success'),
-        tap(() => worker.terminate())
-      );
+    const successMessage$ = message$.pipe(
+      filter(({ type }) => type === 'success'),
+      tap(() => worker.terminate())
+    );
 
     const timeoutClose$ = timer(1000).pipe(
       takeUntil(successMessage$),
       tap(() => worker.terminate()),
-      switchMap(() => throwError(() => new Error(`The script was executed for more than 1 second and was terminated!`)))
+      switchMap(() =>
+        throwError(
+          () =>
+            new Error(
+              `The script was executed for more than 1 second and was terminated!`
+            )
+        )
+      )
     );
 
     worker.postMessage('RUN'); // Start the worker.
@@ -36,17 +52,27 @@ export class TerminalWidgetService {
     return message$.pipe(
       takeUntil(successMessage$),
       takeUntil(timeoutClose$),
-      tap(() => {
+      tap(({ type, data }) => {
+        if(type === 'error') {
+          this.snackBar.open(data[0], '', {
+            panelClass: ['error'],
+          });
+          return;
+        }
         this.snackBar.open('Compiled', '', {
           panelClass: ['success'],
-        })
+        });
       }),
-      catchError((error: Error): Observable<TerminalLog> => of({ type: 'error', data: [error.message] }))
-    )
+      catchError((error: Error): Observable<TerminalLog> => {
+        this.snackBar.open(error.message, '', {
+          panelClass: ['error'],
+        });
+        return of({ type: 'error', data: [error.message] });
+      })
+    );
   }
 
   private getWorkerCode(codeToInject: string): string {
-
     return `
         onmessage = (message) => {
             
@@ -110,7 +136,9 @@ export class TerminalWidgetService {
   }
 
   private getCodeBlob(code: string): any {
-    const blob = new Blob([this.getWorkerCode(code)], { type: "text/javascript" });
+    const blob = new Blob([this.getWorkerCode(code)], {
+      type: 'text/javascript',
+    });
     return URL.createObjectURL(blob);
   }
 }

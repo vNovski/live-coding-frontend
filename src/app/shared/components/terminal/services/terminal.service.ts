@@ -11,6 +11,10 @@ export class TerminalService {
   }
 
   eval(code: string): Observable<TerminalLog> {
+    if(!code) {
+      return of({ type: 'error', data: [] });
+    }
+
     const worker = new Worker(this.getCodeBlob(code));
 
     const message$ = fromEvent<MessageEvent>(worker, 'message')

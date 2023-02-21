@@ -37,12 +37,16 @@
 }
 
 ::ng-deep .other-cursor {
+  transition: all ease-in-out 0.5s;
   position: absolute;
-  z-index: 0;
   padding: 0;
   border-left-width: 2px;
   border-left-style: solid;
   animation: pulsate 1s steps(1) infinite;
+
+  &:hover {
+    animation: none;
+  }
 }
 
 .content-wrapper {
@@ -118,4 +122,10 @@
   50% {
     border-left-color: transparent;
   }
+}
+
+.tootlip {
+  position: absolute;
+  background: red;
+  z-index: 99999;
 }

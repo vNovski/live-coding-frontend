@@ -11,6 +11,7 @@ export enum CommunicationEventTypes {
   terminalSelectionChange = 'terminal-selection-change',
   connect = 'client-connect',
   disconnect = 'client-disconnect',
+  clientInit = 'client-init',
   shareConnections = 'room:share-connections',
   joinRoom = 'join-room',
   leaveRoom = 'leave-room',
@@ -38,6 +39,7 @@ export class SocketService {
 
   private monitorConnectionStatus() {
     this.socket.on('connect', () => {
+      console.log("ID", this.socket.id)
       this._available$.next(true);
     })
 

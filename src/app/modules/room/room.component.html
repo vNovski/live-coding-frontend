@@ -9,7 +9,7 @@
       [editorChange]="roomService.otherChanged$ | async"
       [otherSelection]="roomService.otherSelectionChange$ | async"
       [otherCursor]="roomService.otherCursorChange$ | async"
-      [otherMouses]="(roomService.connections$ | async) || []"
+      [otherMouses]="(userIds$ | async) || []"
       [otherMouseMove]="(roomService.otherMouseMove$ | async) || []"
       [otherLog]="roomService.executionLog$ | async"
       (logsChange)="onLogsChange($event)"

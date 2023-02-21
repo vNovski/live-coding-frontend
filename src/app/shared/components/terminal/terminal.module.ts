@@ -9,7 +9,7 @@ import { TerminalComponent } from './terminal.component';
 
 @NgModule({
   declarations: [
-    TerminalComponent
+    TerminalComponent,
   ],
   imports: [
     CommonModule,

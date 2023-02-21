@@ -1,0 +1,27 @@
+
+
+
+<div class="indicator"
+    *ngIf="(roomService.connections$ | async) as connections"
+    [matMenuTriggerFor]="menu"
+    [ngClass]="connections.length ? 'online' : 'offline'"
+    [matMenuTriggerData]="{connections: connections}">
+</div>
+
+<mat-menu #menu="matMenu" class="connections">
+    <ng-template matMenuContent let-connections="connections">
+        <ng-container *ngIf="connections.length">
+            <span class="connections-title">Connections</span>
+            <button
+                class="user"
+                disabled mat-menu-item
+                *ngFor="let user of connections">
+                <span [ngStyle]="{'background': user.color}" class="user-photo"></span>
+                <span>{{user.username }}</span>
+            </button>
+        </ng-container>
+        <ng-container *ngIf="!connections.length">
+           <app-empty message="No Clients Connected"></app-empty>
+        </ng-container>
+    </ng-template>
+</mat-menu>

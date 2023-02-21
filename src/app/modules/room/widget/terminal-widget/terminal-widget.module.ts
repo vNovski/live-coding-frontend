@@ -8,6 +8,8 @@ import { SharedModule } from 'src/app/shared/shared.module';
 import { HeaderComponent } from './components/header/header.component';
 import { MouseIndicatorsDirective } from './directives/mouse-indicators.directive';
 import { ShortcutsDialogComponent } from './components/shortcuts-dialog/shortcuts-dialog.component';
+import { OnlineIndicatorComponent } from './components/online-indicator/online-indicator.component';
+import { TestComponent } from './components/test/test.component';
 
 @NgModule({
   declarations: [
@@ -15,6 +17,8 @@ import { ShortcutsDialogComponent } from './components/shortcuts-dialog/shortcut
     HeaderComponent,
     MouseIndicatorsDirective,
     ShortcutsDialogComponent,
+    OnlineIndicatorComponent,
+    TestComponent,
   ],
   imports: [
     CommonModule,

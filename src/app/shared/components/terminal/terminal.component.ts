@@ -16,10 +16,12 @@ import {
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { Editor, EditorChange, EditorFromTextArea, Position, ScrollInfo } from 'codemirror';
-import { isNill } from 'src/app/core/utils/isNill';
 import { js_beautify } from 'js-beautify';
+import { isNill } from 'src/app/core/utils/isNill';
+
 import { TerminalShortcuts } from './enums/terminal-shortcuts.enum';
 
+// @ts-ignore
 
 function normalizeLineEndings(str: string): string {
   if (!str) {
@@ -103,7 +105,7 @@ export class TerminalComponent implements AfterViewInit, OnDestroy, ControlValue
     lineNumbers: true,
     theme: 'material',
     mode: 'text/typescript',
-    indentUnit: 2
+    indentUnit: 2,
   };
 
   constructor(private _differs: KeyValueDiffers, private _ngZone: NgZone) { }
@@ -121,6 +123,7 @@ export class TerminalComponent implements AfterViewInit, OnDestroy, ControlValue
   ngAfterViewInit() {
     this._ngZone.runOutsideAngular(async () => {
       this.codeMirror = await this.createEditor();
+      
       this.codeMirror.on('cursorActivity', cm => this._ngZone.run(() => this.cursorActive(cm)));
       this.codeMirror.on('scroll', this.scrollChanged.bind(this));
       this.codeMirror.on('blur', (cm) => this._ngZone.run(() => this.focusChanged(cm, false)));
@@ -254,6 +257,7 @@ export class TerminalComponent implements AfterViewInit, OnDestroy, ControlValue
 
   private async createEditor(): Promise<EditorFromTextArea> {
     const codeMirrorObj = await this.codeMirrorGlobal;
+
     const codeMirror = codeMirrorObj?.default ? codeMirrorObj.default : codeMirrorObj;
     return codeMirror.fromTextArea(
       this.ref.nativeElement,
