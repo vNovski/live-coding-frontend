@@ -10,10 +10,6 @@ export class OnlineIndicatorComponent implements OnInit {
 
   constructor(public roomService: RoomService) { }
 
-  ngOnInit(): void {
-    this.roomService.connections$.subscribe(data => {
-      console.log(data)
-    })
-  }
+  ngOnInit(): void {}
 
 }

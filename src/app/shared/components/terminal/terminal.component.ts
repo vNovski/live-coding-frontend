@@ -198,7 +198,9 @@ export class TerminalComponent implements AfterViewInit, OnDestroy, ControlValue
     this.scroll.emit(cm.getScrollInfo());
   }
   cursorActive(cm: Editor) {
-    this.cursorActivity.emit(cm);
+    if(this.isFocused) {
+      this.cursorActivity.emit(cm);
+    }
   }
   dropFiles(cm: Editor, e: DragEvent) {
     this.drop.emit([cm, e]);

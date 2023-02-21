@@ -229,12 +229,11 @@ export class TerminalWidgetComponent
 
       if (marker) {
         marker.clear();
-
-        if (cursor.outside === 0) {
-          return;
-        }
       }
 
+      if (cursor.outside === 0) {
+        return;
+      }
       const cursorCoords = this.editor.codeMirror.cursorCoords(cursor);
       const cursorElement = this.renderer.createElement('span');
       cursorElement.classList.add('other-cursor');
