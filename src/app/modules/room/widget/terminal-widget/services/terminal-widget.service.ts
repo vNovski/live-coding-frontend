@@ -19,6 +19,18 @@ import { transpileModule, ModuleKind } from 'typescript';
 export class TerminalWidgetService {
   constructor(private readonly snackBar: SnackbarService) {}
 
+  download(code: string): void {
+    if(!code) {
+      return;
+    }
+    const blob = new Blob([code], { type: 'text/javascript' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.setAttribute('href', url);
+    a.setAttribute('download', 'code');
+    a.click();
+  }
+
   eval(code: string): Observable<TerminalLog> {
     let { outputText: jsCode } = transpileModule(code, {
       compilerOptions: { module: ModuleKind.CommonJS, allowJs: true },

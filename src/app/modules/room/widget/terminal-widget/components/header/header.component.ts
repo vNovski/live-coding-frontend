@@ -1,5 +1,6 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
-import {MatDialog, MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
+import { MatDialog } from '@angular/material/dialog';
+
 import { ShortcutsDialogComponent } from '../shortcuts-dialog/shortcuts-dialog.component';
 
 @Component({
@@ -11,6 +12,7 @@ export class HeaderComponent implements OnInit {
   @Output() execute = new EventEmitter<void>();
   @Output() watch = new EventEmitter<boolean>();
   @Output() toggleFullScreen = new EventEmitter<boolean>();
+  @Output() downloadEvent = new EventEmitter<void>();
 
   constructor(private readonly dialog: MatDialog) { }
 
@@ -46,6 +48,10 @@ export class HeaderComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
     });
+  }
+
+  download(): void {
+    this.downloadEvent.emit();
   }
 
 }

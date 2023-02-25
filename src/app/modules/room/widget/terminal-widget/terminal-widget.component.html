@@ -1,7 +1,10 @@
 <div class="terminal-widget"
     [class.fullscreen]="fullscreenStatus">
-    <app-terminal-widget-header (watch)="onWatch($event)" (execute)="execute()"
-        (toggleFullScreen)="toggleFullscreen($event)"></app-terminal-widget-header>
+    <app-terminal-widget-header
+        (watch)="onWatch($event)"
+        (execute)="execute()"
+        (toggleFullScreen)="toggleFullscreen($event)"
+        (downloadEvent)="download()"></app-terminal-widget-header>
     <app-online-indicator></app-online-indicator>
     <div class="content-wrapper">
         <div #terminalWidget class="content"
@@ -13,9 +16,9 @@
                         (focusChange)="focusChange($event)"
                         (cursorActivity)="onCursorActivity($event)"
                         (scroll)="onScrollChange($event)"></app-terminal>
-                    </form>
-                </div>
+                </form>
             </div>
-            
         </div>
+
+    </div>
 </div>

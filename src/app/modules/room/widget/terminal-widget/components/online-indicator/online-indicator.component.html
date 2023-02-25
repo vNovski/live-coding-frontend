@@ -2,7 +2,7 @@
 
 
 <div class="indicator"
-    *ngIf="(roomService.connections$ | async) as connections"
+    *ngIf="(connections$ | async) as connections"
     [matMenuTriggerFor]="menu"
     [ngClass]="connections.length ? 'online' : 'offline'"
     [matMenuTriggerData]="{connections: connections}">

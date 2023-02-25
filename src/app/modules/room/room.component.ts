@@ -14,7 +14,6 @@ import {
 import { UserService } from 'src/app/core/services/user/user.service';
 import { TerminalLog } from 'src/app/shared/components/terminal/interfaces/terminal-log.interface';
 import { RoomService } from './room.service';
-import { TermianlEvents } from './widget/enums/terminal-events.enum';
 import { TerminalChange } from './widget/terminal-widget/interfaces/terminal-change.interface';
 
 function roomServiceFactory(

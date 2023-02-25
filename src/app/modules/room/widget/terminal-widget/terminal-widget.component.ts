@@ -180,6 +180,10 @@ export class TerminalWidgetComponent
     this.isWatchEnabled = status;
   }
 
+  download(): void {
+    this.terminalWidgetService.download(this.contentControl!.value.value);
+  }
+
   private listenMouseMove() {
     const terminal = this.terminalContainer.nativeElement;
     fromEvent<MouseEvent>(terminal, 'mouseleave')
