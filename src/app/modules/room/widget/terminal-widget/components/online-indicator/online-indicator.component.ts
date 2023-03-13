@@ -21,7 +21,7 @@ export class OnlineIndicatorComponent implements OnInit {
 
   constructor(
     public roomService: RoomService,
-    private userService: UserService
+    public userService: UserService
   ) {}
 
   ngOnInit(): void {}

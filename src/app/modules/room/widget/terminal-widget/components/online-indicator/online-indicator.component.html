@@ -14,6 +14,13 @@
             <span class="connections-title">Connections</span>
             <button
                 class="user"
+                disabled mat-menu-item>
+                <span [ngStyle]="{'background': userService.color}"
+                    class="user-photo"></span>
+                <span>{{userService.username }} (you)</span>
+            </button>
+            <button
+                class="user"
                 disabled mat-menu-item
                 *ngFor="let user of connections">
                 <span [ngStyle]="{'background': user.color}" class="user-photo"></span>
@@ -21,7 +28,7 @@
             </button>
         </ng-container>
         <ng-container *ngIf="!connections.length">
-           <app-empty message="No Clients Connected"></app-empty>
+            <app-empty message="You're alone in this room :("></app-empty>
         </ng-container>
     </ng-template>
 </mat-menu>

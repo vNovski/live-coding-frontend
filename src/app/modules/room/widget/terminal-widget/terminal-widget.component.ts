@@ -161,7 +161,7 @@ export class TerminalWidgetComponent
 
   execute(): void {
     this.terminalWidgetService
-      .eval(this.contentControl!.value.value)
+      .eval(this.contentControl!.value.value || this.contentControl!.value) // TODO: Get rid of this shit 
       .subscribe((log) => {
         this.logsChange.emit(log);
         this.log(log);
