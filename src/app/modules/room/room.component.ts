@@ -68,9 +68,6 @@ export class RoomComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    setTimeout(() => {
-      this.contactSupport();
-    }, 1000);
     this.route.params.subscribe((params) => {
       const id = params['id'];
       this.roomId = id;
