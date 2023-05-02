@@ -56,6 +56,7 @@ export class TerminalWidgetComponent
     if (isNill(data)) {
       return;
     }
+    
     this.contentControl!.patchValue(data.value, { emitEvent: false });
   }
 
@@ -303,7 +304,10 @@ export class TerminalWidgetComponent
   private listenForm() {
     this.terminalForm.valueChanges
       .pipe(takeUntil(this.ngUnsubscribe))
-      .subscribe(({ content }: { content: TerminalChange }) => {
+      .subscribe(({ content }: { content: TerminalChange & { ignore: true } }) => {
+        if(content.ignore) { // if client recevied changes the he should npt sync these changes
+          return;
+        }
         this.edit.emit(content);
       });
   }

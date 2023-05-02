@@ -130,9 +130,6 @@ export class TerminalComponent implements AfterViewInit, OnDestroy, ControlValue
       this.codeMirror.on('focus', (cm) => this._ngZone.run(() => this.focusChanged(cm, true)));
       this.codeMirror.on('change', (cm, change) =>
         this._ngZone.run(() => {
-          if(change.origin === '+ignore') {
-            return;
-          }
           this.codemirrorValueChanged(cm, change);
         }),
       );
@@ -173,7 +170,7 @@ export class TerminalComponent implements AfterViewInit, OnDestroy, ControlValue
     }
 
     this.value = cmVal;
-    this.onChange({ value: this.value, change: change });
+    this.onChange({ value: this.value, change: change, ignore: change.origin === '+ignore' });
   }
   setOptionIfChanged(optionName: string, newValue: any) {
     if (!this.codeMirror) {
@@ -240,6 +237,7 @@ export class TerminalComponent implements AfterViewInit, OnDestroy, ControlValue
       this.lastChange = change;
       this.codeMirror.replaceRange(change.text, change.from, change.to, '+ignore');
       this.value = this.codeMirror.getValue();
+      // this.onChange({ value: this.value, change: change });
     }
   }
 
