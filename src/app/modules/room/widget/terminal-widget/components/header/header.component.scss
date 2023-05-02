@@ -1,115 +1,145 @@
 @import "../../../../../../../theme/index.scss";
 
 ::ng-deep .settings-menu {
-    background: var(--container-background-color);
-    border-radius: 12px !important;
-    margin-top: 4px;
+  background: var(--container-background-color);
+  border-radius: 12px !important;
+  margin-top: 4px;
 
-    button {
-        color: var(--text-color) !important;
-        font-weight: 500;
+  button {
+    color: var(--text-color) !important;
+    font-weight: 500;
 
-        mat-icon {
-            color: #546E7A !important;
-        }
+    mat-icon {
+      color: #546e7a !important;
     }
+  }
+}
+
+::ng-deep .about-us-dialog {
+  max-width: 100vw;
+  max-height: 100vh;
+
+  @include for-phone-only {
+    width: 100vw;
+  }
+
+  @include for-tablet-portrait-up {
+    width: 90vw;
+  }
+
+  @include for-desktop-up {
+    width: 80%;
+  }
+
+  .mat-dialog-container {
+    background-color: var(--background-color);
+  }
 }
 
 ::ng-deep .shortcuts-dialog {
-    .mat-dialog-container {
-        background-color: var(--background-color);
-        margin: 0;
-        padding: 0;
-    }
+  .mat-dialog-container {
+    background-color: var(--background-color);
+    margin: 0;
+    padding: 0;
+  }
 
-    max-width: 100vw;
-    max-height: 100vh;
-    @include for-phone-only {
-        height: 100vh;
-        width: 100vw;
-    }
+  max-width: 100vw;
+  max-height: 100vh;
+  @include for-phone-only {
+    height: 100vh;
+    width: 100vw;
+  }
 
-    @include for-tablet-portrait-up {
-        height: 90vh;
-        width: 90vw;
-    }
+  @include for-tablet-portrait-up {
+    height: 90vh;
+    width: 90vw;
+  }
 
-    @include for-desktop-up {
-        width: 70%;
-        height: 70vh;
-    }
-
+  @include for-desktop-up {
+    width: 70%;
+    height: 70vh;
+  }
 }
 
-
 .version {
-    margin-top: 5px;
-    font-size: 12px;
-    display: block;
-    color: #546E7A;
-    text-align: center;
+  margin-top: 5px;
+  font-size: 12px;
+  display: block;
+  color: #546e7a;
+  text-align: center;
 }
 
 .terminal-widget-header {
-    width: 100%;
-    height: 50px;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    background: var(--background-color);
+  width: 100%;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  background: transparent;
 
-    .controls {
-        z-index: 5;
-        transition: var(--transition);
+  .controls {
+    z-index: 5;
+    transition: var(--transition);
+  }
+
+  button {
+    transition: all 0.2s ease-in-out;
+    box-shadow: 0 0 5px 0 #00000091;
+    background: var(--container-background-color);
+
+    &:not(:last-of-type) {
+      margin-right: 10px;
     }
 
-    button {
+    &:hover {
+      box-shadow: var(--shadow);
+      filter: brightness(1.1);
+    }
+
+    &:active {
+      box-shadow: inset var(--shadow);
+    }
+
+    &.execute-btn {
+      .mat-icon {
         transition: all 0.2s ease-in-out;
-        box-shadow: 0 0 5px 0 #00000091;
-        background: var(--container-background-color);
-
-        &:not(:last-of-type) {
-            margin-right: 10px;
-        }
-
-        &:hover {
-            box-shadow: var(--shadow);
-            filter: brightness(1.1);
-        }
-
-        &:active {
-            box-shadow: inset var(--shadow);
-        }
-
-        &.execute-btn {
-            .mat-icon {
-                transition: all 0.2s ease-in-out;
-                line-height: 30px;
-                width: 30px;
-                height: 30px;
-                font-size: 30px;
-                color: rgb(48, 107, 57);
-            }
-
-        }
-
-        &.settings-btn {
-            transition: var(--transition);
-
-            mat-icon {
-                transition: var(--transition);
-            }
-
-            &:hover {
-                mat-icon {
-                    transform: rotate(180deg) !important;
-                }
-            }
-
-            &:active {
-                box-shadow: inset var(--shadow);
-                filter: brightness(1);
-            }
-        }
+        line-height: 30px;
+        width: 30px;
+        height: 30px;
+        font-size: 30px;
+        color: rgb(48, 107, 57);
+      }
     }
+
+    &.settings-btn {
+      transition: var(--transition);
+
+      mat-icon {
+        transition: var(--transition);
+      }
+
+      &:hover {
+        mat-icon {
+          transform: rotate(180deg) !important;
+        }
+      }
+
+      &:active {
+        box-shadow: inset var(--shadow);
+        filter: brightness(1);
+      }
+    }
+
+    &.fullscreen-btn {
+      .mat-icon {
+        transition: var(--transition);
+      }
+
+      &:hover {
+        .mat-icon {
+          transform: scale(1.3);
+        }
+      }
+    }
+  }
 }

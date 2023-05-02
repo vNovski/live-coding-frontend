@@ -13,7 +13,20 @@
     height: 100vh;
 }
 
-
+.support-btn {
+    background: var(--container-background-color);
+    transition: var(--transition);
+    box-shadow: var(--shadow);
+    position: absolute;
+    bottom: 1rem;
+    right: 1rem;
+    z-index: 5;
+    
+    &:hover {
+        box-shadow: var(--shadow);
+        filter: brightness(1.1);
+    }
+}
 
 .logout-btn {
     transform: scale(-1);
@@ -29,3 +42,24 @@
         pointer-events: none;
     }
 }
+
+::ng-deep .contact-support-dialog {
+    max-width: 100vw;
+    max-height: 100vh;
+  
+    @include for-phone-only {
+      width: 100vw;
+    }
+  
+    @include for-tablet-portrait-up {
+      width: 80vw;
+    }
+  
+    @include for-desktop-up {
+      width: 50%;
+    }
+  
+    .mat-dialog-container {
+      background-color: var(--background-color);
+    }
+  }

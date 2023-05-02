@@ -140,6 +140,10 @@ export class ShortcutsDialogComponent implements OnInit {
     {
       command: 'Toggle the overwrite flag',
       binding: ['Insert']
+    },
+    {
+      command: 'We are still working on implementing some new  useful shortcuts...',
+      binding: []
     }
   ]
 

@@ -19,4 +19,8 @@
       (mouseMove)="onMouseMove($event)"
       (fullscreenChange)="fullscreenChange($event)"></app-terminal-widget>
   </div>
+  <button class="support-btn icon-button" [class.hide]="hideLeaveBtn"
+    mat-icon-button (click)="contactSupport()">
+    <mat-icon>contact_support</mat-icon>
+  </button>
 </div>

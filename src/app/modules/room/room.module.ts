@@ -10,17 +10,25 @@ import { SharedModule } from 'src/app/shared/shared.module';
 import { RoomRoutingModule } from './room-routing.module';
 import { RoomComponent } from './room.component';
 import { TerminalWidgetModule } from './widget/terminal-widget/terminal-widget.module';
+import { ContactSupportDialogComponent } from './components/contact-support-dialog/contact-support-dialog.component';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
 
 @NgModule({
   declarations: [
     RoomComponent,
+    ContactSupportDialogComponent,
   ],
   imports: [
     CommonModule,
     TerminalWidgetModule,
     RoomRoutingModule,
     MaterialModule,
-    SharedModule
+    MatFormFieldModule,
+    MatInputModule,
+    SharedModule,
+    MatSelectModule
   ]
 })
 export class RoomModule { }

@@ -2,6 +2,7 @@ import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 
 import { ShortcutsDialogComponent } from '../shortcuts-dialog/shortcuts-dialog.component';
+import { AboutUsDialogComponent } from '../about-us-dialog/about-us-dialog.component';
 
 @Component({
   selector: 'app-terminal-widget-header',
@@ -41,12 +42,20 @@ export class HeaderComponent implements OnInit {
 
   openShortcutsDialog(): void {
     const dialogRef = this.dialog.open(ShortcutsDialogComponent, {
-      maxWidth: '100vw',
-      maxHeight: '100vh',
+      maxWidth: '50vw',
+      maxHeight: '50vh',
       panelClass: 'shortcuts-dialog'
     });
 
     dialogRef.afterClosed().subscribe(result => {
+    });
+  }
+
+  openAboutUsDialog(): void {
+    const dialogRef = this.dialog.open(AboutUsDialogComponent, {
+      maxWidth: '100vw',
+      maxHeight: '100vh',
+      panelClass: 'about-us-dialog'
     });
   }
 

@@ -2,7 +2,7 @@
 
 @import "~codemirror/lib/codemirror";
 @import "~codemirror/theme/material";
-@import 'tippy.js/dist/tippy.css'; 
+@import "tippy.js/dist/tippy.css";
 *,
 *::after,
 *::before {
@@ -81,12 +81,87 @@ body {
   background-color: #546e7a;
 }
 
+// mat-icon-stepper selected color change
+.mat-step-header .mat-step-icon-selected,
+.mat-step-header .mat-step-icon-state-done,
+.mat-step-header .mat-step-icon-state-edit {
+  background-color: var(--text-color) !important;
+}
+
+//input outline color
+.mat-form-field-appearance-outline .mat-form-field-outline {
+  color: var(--container-background-color) !important;
+  // opacity: 1!important;
+}
+
+//mat-input focused color
+.mat-form-field-appearance-outline.mat-focused .mat-form-field-outline-thick {
+  color: var(--text-color) !important;
+}
+
+// mat-input error outline color
+.mat-form-field-appearance-outline.mat-form-field-invalid.mat-form-field-invalid
+  .mat-form-field-outline-thick {
+  color: var(--text-color) !important;
+  opacity: 0.8 !important;
+}
+
+// mat-input carent color
+.mat-input-element {
+  caret-color: var(--text-color) !important;
+}
+
+// mat-input error carent color
+.mat-form-field-invalid .mat-input-element,
+.mat-warn .mat-input-element {
+  caret-color: red !important;
+}
+
+// mat-label normal state style
+.mat-form-field-label {
+  color: rgba(0, 0, 0, 0.6) !important;
+  // color: $mainColor!important;
+}
+
+// mat-label focused style
+.mat-form-field.mat-focused .mat-form-field-label {
+  color: var(--text-color) !important;
+}
+
+// mat-label error style
+.mat-form-field.mat-form-field-invalid .mat-form-field-label {
+  color: var(--text-color) !important;
+}
+
+.mat-select-arrow-wrapper {
+  .mat-select-arrow {
+    color: var(--text-color);
+  }
+}
+
+.mat-select-value {
+  color: var(--text-color);
+}
+
+.mat-form-field-label {
+  /*change color of label*/
+  color: var(--text-color) !important;
+}
+
+textarea {
+  /*change color of label*/
+  color: var(--text-color) !important;
+}
+
+input {
+  color: var(--text-color) !important;
+}
 
 .tippy-box {
-    margin: -10px 0;
-    font-size: 12px;
+  margin: -10px 0;
+  font-size: 12px;
 
-    .tippy-content {
-        padding: 2px 5px;
-    }
+  .tippy-content {
+    padding: 2px 5px;
+  }
 }

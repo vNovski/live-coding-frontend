@@ -15,6 +15,8 @@ import { UserService } from 'src/app/core/services/user/user.service';
 import { TerminalLog } from 'src/app/shared/components/terminal/interfaces/terminal-log.interface';
 import { RoomService } from './room.service';
 import { TerminalChange } from './widget/terminal-widget/interfaces/terminal-change.interface';
+import { ContactSupportDialogComponent } from './components/contact-support-dialog/contact-support-dialog.component';
+import { MatDialog } from '@angular/material/dialog';
 
 function roomServiceFactory(
   route: ActivatedRoute,
@@ -61,10 +63,14 @@ export class RoomComponent implements OnInit, OnDestroy {
     public socketService: SocketService,
     private route: ActivatedRoute,
     private readonly router: Router,
-    readonly roomService: RoomService
+    readonly roomService: RoomService,
+    private readonly dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
+    setTimeout(() => {
+      this.contactSupport();
+    }, 1000);
     this.route.params.subscribe((params) => {
       const id = params['id'];
       this.roomId = id;
@@ -99,6 +105,14 @@ export class RoomComponent implements OnInit, OnDestroy {
   leaveRoom(): void {
     this.socketService.emit(RoomEvents.leave, this.roomId);
     this.router.navigate(['/']);
+  }
+
+  contactSupport(): void {
+    const dialogRef = this.dialog.open(ContactSupportDialogComponent, {
+      maxWidth: '100vw',
+      maxHeight: '100vh',
+      panelClass: 'contact-support-dialog',
+    });
   }
 
   ngOnDestroy() {

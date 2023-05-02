@@ -9,6 +9,7 @@ import { MouseIndicatorsDirective } from './directives/mouse-indicators.directiv
 import { ShortcutsDialogComponent } from './components/shortcuts-dialog/shortcuts-dialog.component';
 import { OnlineIndicatorComponent } from './components/online-indicator/online-indicator.component';
 import { TestComponent } from './components/test/test.component';
+import { AboutUsDialogComponent } from './components/about-us-dialog/about-us-dialog.component';
 
 @NgModule({
   declarations: [
@@ -18,6 +19,7 @@ import { TestComponent } from './components/test/test.component';
     ShortcutsDialogComponent,
     OnlineIndicatorComponent,
     TestComponent,
+    AboutUsDialogComponent,
   ],
   imports: [
     CommonModule,
