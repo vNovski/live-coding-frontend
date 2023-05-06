@@ -46,20 +46,26 @@
 ::ng-deep .contact-support-dialog {
     max-width: 100vw;
     max-height: 100vh;
+    text-align: center;
   
     @include for-phone-only {
       width: 100vw;
     }
   
     @include for-tablet-portrait-up {
-      width: 80vw;
+      width: 50vw;
     }
   
     @include for-desktop-up {
-      width: 50%;
+      width: 30%;
     }
   
     .mat-dialog-container {
       background-color: var(--background-color);
+      margin: 0;
+      padding-left: 0;
+      padding-right: 0;
+      padding-bottom: 0;
+      overflow: hidden;
     }
   }
