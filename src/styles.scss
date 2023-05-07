@@ -153,6 +153,14 @@ textarea {
   color: var(--text-color) !important;
 }
 
+.close-dialog-icon-btn {
+  color: var(--text-color);
+  position: absolute !important;
+  right: 5px;
+  top: 5px;
+  z-index: 10;
+}
+
 input {
   color: var(--text-color) !important;
 }

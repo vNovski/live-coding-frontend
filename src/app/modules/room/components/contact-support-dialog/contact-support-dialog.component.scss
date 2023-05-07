@@ -6,6 +6,10 @@ a {
   color: var(--text-color);
 }
 
+.mat-dialog-content {
+  position: relative;
+}
+
 .text {
   position: absolute;
   z-index: 99;
@@ -13,6 +17,7 @@ a {
   left: 50%;
   transform: translateX(-50%);
 }
+
 
 .loop-wrapper {
   margin: 0 auto;
