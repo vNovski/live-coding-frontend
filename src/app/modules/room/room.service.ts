@@ -16,7 +16,7 @@ import {
   UserService,
 } from 'src/app/core/services/user/user.service';
 import { ConnectionSnackbarComponent } from 'src/app/shared/components/connection-snackbar/connection-snackbar.component';
-import { TerminalLog } from 'src/app/shared/components/terminal/interfaces/terminal-log.interface';
+import { ITerminalLog } from 'src/app/shared/components/terminal/interfaces/terminal-log.interface';
 import { RoomEvents } from './enums/room-events.enum';
 import { RoomModule } from './room.module';
 import { TermianlEvents } from './widget/enums/terminal-events.enum';
@@ -128,7 +128,7 @@ export class RoomService {
       });
   }
 
-  shareExecutionLog(log: TerminalLog) {
+  shareExecutionLog(log: ITerminalLog) {
     this.socketService.emit(TermianlEvents.executionLog, {
       roomId: this.id,
       data: log,

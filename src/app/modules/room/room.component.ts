@@ -12,7 +12,7 @@ import {
   SocketService,
 } from 'src/app/core/services/socket/socket.service';
 import { UserService } from 'src/app/core/services/user/user.service';
-import { TerminalLog } from 'src/app/shared/components/terminal/interfaces/terminal-log.interface';
+import { ITerminalLog } from 'src/app/shared/components/terminal/interfaces/terminal-log.interface';
 import { RoomService } from './room.service';
 import { TerminalChange } from './widget/terminal-widget/interfaces/terminal-change.interface';
 import { ContactSupportDialogComponent } from './components/contact-support-dialog/contact-support-dialog.component';
@@ -79,7 +79,7 @@ export class RoomComponent implements OnInit, OnDestroy {
     });
   }
 
-  onLogsChange(log: TerminalLog): void {
+  onLogsChange(log: ITerminalLog): void {
     this.roomService.shareExecutionLog(log);
   }
   onChange(change: TerminalChange): void {

@@ -1,6 +1,7 @@
 <div class="terminal-widget"
     [class.fullscreen]="fullscreenStatus">
     <app-terminal-widget-header
+        [isRunning]="(terminalWidgetService.isRunning$ | async) || false"
         (watch)="onWatch($event)"
         (execute)="execute()"
         (toggleFullScreen)="toggleFullscreen($event)"

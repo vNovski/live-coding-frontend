@@ -1,26 +1,69 @@
 import { Injectable } from '@angular/core';
 import { SocketService } from 'src/app/core/services/socket/socket.service';
-import { TerminalLog } from 'src/app/shared/components/terminal/interfaces/terminal-log.interface';
+import { ITerminalLog } from 'src/app/shared/components/terminal/interfaces/terminal-log.interface';
 import { TermianlEvents } from '../../enums/terminal-events.enum';
 import {
   catchError,
+  debounceTime,
   filter,
   finalize,
   map,
+  observeOn,
+  reduce,
+  scan,
   switchMap,
+  take,
   takeUntil,
   tap,
 } from 'rxjs/operators';
-import { fromEvent, Observable, throwError, timer, of } from 'rxjs';
+import {
+  fromEvent,
+  Observable,
+  throwError,
+  timer,
+  of,
+  asyncScheduler,
+  queueScheduler,
+  OperatorFunction,
+  combineLatest,
+  merge,
+  BehaviorSubject,
+  Subject,
+} from 'rxjs';
 import { SnackbarService } from 'src/app/core/services/snackbar.service';
 import { transpileModule, ModuleKind } from 'typescript';
+import { ETerminalLogTypes } from 'src/app/shared/components/terminal/enums/terminal-log-types.enum';
+import { IAsyncOperation } from 'src/app/shared/components/terminal/interfaces/terminal-asyncOperation.interface';
+import { EExecutionEvents } from 'src/app/shared/components/terminal/enums/terminal-executon-events.enum';
+
+function bufferDebounceTime(
+  time: number = 0
+): OperatorFunction<MessageEvent, ITerminalLog[]> {
+  return (source: Observable<MessageEvent>) => {
+    let bufferedValues: ITerminalLog[] = [];
+
+    return source.pipe(
+      tap((value) => bufferedValues.push(<ITerminalLog>JSON.parse(value.data))),
+      debounceTime(time),
+      map(() => bufferedValues),
+      tap(() => console.log(bufferedValues)),
+      tap(() => (bufferedValues = []))
+    );
+  };
+}
 
 @Injectable()
 export class TerminalWidgetService {
+  private isWorkerAlive$ = new BehaviorSubject(false);
+  private worker: Worker | null = null;
+  private workerLiveTime = 5000; // in ms
+
+  public readonly isRunning$ = this.isWorkerAlive$.asObservable();
+
   constructor(private readonly snackBar: SnackbarService) {}
 
   download(code: string): void {
-    if(!code) {
+    if (!code) {
       return;
     }
     const blob = new Blob([code], { type: 'text/javascript' });
@@ -31,68 +74,112 @@ export class TerminalWidgetService {
     a.click();
   }
 
-  eval(code: string): Observable<TerminalLog> {
-    let { outputText: jsCode } = transpileModule(code, {
-      compilerOptions: { module: ModuleKind.CommonJS, allowJs: true },
-    });
-    const worker = new Worker(this.getCodeBlob(jsCode));
+  eval(code: string): Observable<ITerminalLog[]> {
+    if (this.isWorkerAlive$.value) {
+      this.terminateWorker();
+      return of([]);
+    }
 
-    const message$ = fromEvent<MessageEvent>(worker, 'message').pipe(
-      map((e) => <TerminalLog>JSON.parse(e.data))
-    );
+    if (this.worker) {
+      this.terminateWorker();
+    }
 
-    const successMessage$ = message$.pipe(
-      filter(({ type }) => type === 'success'),
-      tap(() => worker.terminate())
-    );
+    this.isWorkerAlive$.next(true);
 
-    const timeoutClose$ = timer(1000).pipe(
-      takeUntil(successMessage$),
-      tap(() => worker.terminate()),
-      switchMap(() =>
-        throwError(
-          () =>
-            new Error(
-              `The script was executed for more than 1 second and was terminated!`
-            )
-        )
+    this.worker = new Worker(this.getCodeBlob(code));
+
+    const workerEvents$ = fromEvent<MessageEvent>(this.worker, 'message').pipe(
+      observeOn(asyncScheduler),
+      map(
+        (
+          e
+        ): {
+          type: EExecutionEvents;
+          data: ITerminalLog[] | null | string;
+        } => JSON.parse(e.data)
       )
     );
+    const syncAndAsyncCompleteEvent$ = workerEvents$.pipe(
+      filter(
+        ({ type }) =>
+          type === EExecutionEvents.syncComplete ||
+          type === EExecutionEvents.asyncComplete
+      ),
+      take(2),
+      reduce((acc) => acc + 1, 0),
+      tap(() => this.terminateWorker())
+    )
 
-    worker.postMessage('RUN'); // Start the worker.
 
-    return message$.pipe(
-      takeUntil(successMessage$),
-      takeUntil(timeoutClose$),
-      tap(({ type, data }) => {
-        if(type === 'error') {
-          this.snackBar.open(data[0], '', {
-            panelClass: ['error'],
-          });
-          return;
-        }
-        this.snackBar.open('Compiled', '', {
-          panelClass: ['success'],
-        });
-      }),
-      catchError((error: Error): Observable<TerminalLog> => {
+    const clientError$ = fromEvent<ErrorEvent>(this.worker, 'error').pipe(
+      tap((error) => {
         this.snackBar.open(error.message, '', {
           panelClass: ['error'],
         });
-        return of({ type: 'error', data: [error.message] });
-      })
+        this.terminateWorker();
+      }),
+      map((error): ITerminalLog[] => [{ type: 'error', data: [error.message] }])
     );
+
+    const clientEvents$ = workerEvents$.pipe(
+      takeUntil(
+        syncAndAsyncCompleteEvent$.pipe(
+          filter((completedOperations) => completedOperations === 2)
+        )
+      ),
+      filter(({ type }) => type === EExecutionEvents.client),
+      map(({ data }) => data as ITerminalLog[])
+    );
+
+    this.worker.postMessage('RUN'); // Start the worker.
+    return merge(clientEvents$, clientError$);
+  }
+
+  private terminateWorker() {
+    console.log('kill');
+    this.isWorkerAlive$.next(false);
+    this.worker?.terminate();
+    this.worker = null;
   }
 
   private getWorkerCode(codeToInject: string): string {
     return `
+        class AsyncOperationsManager {
+          counter = 0;
+          postMessage;
+
+          constuctor(postMessage) {
+            this.postMessage = postMessage
+          }
+        
+          inc() {
+            this.counter+=1;
+            this.shareUpdate();
+          }
+        
+          dec() {
+            this.counter-=1;
+            this.shareUpdate();
+          }
+
+          shareUpdate() {
+            if(this.counter === 0) {
+              self.postMessage(JSON.stringify({ type: ${EExecutionEvents.asyncComplete}, data: null }));
+            }
+          }
+        }
+        
+        const timersSet = new Set();
+        
         onmessage = (message) => {
-            
-            const actions = [];
+            const nativePostMessage = this.postMessage;
+            const asyncOperationManager = new AsyncOperationsManager(nativePostMessage);
+            const bufferTime = 100 // ms;
+            let startTime = performance.now();
+            let actions = [];
             const unit = message.data;
             
-            const nativePostMessage = this.postMessage;
-            
+
             ['log', 'info', 'warn', 'error'].forEach(patchConsoleMethod);
             // const sandboxProxy = new Proxy(Object.assign(unitApi, apis), {has, get});
             
@@ -101,14 +188,65 @@ export class TerminalWidgetService {
             // });
             
             this.Function = function() { return 'Not bad =)' };
-            
+
+            // Monkey patched async methods
+
+            // Promise
+            class LiveCodingPromise extends Promise {
+              constructor(executor, test) {
+                asyncOperationManager.inc();
+                super(executor);
+                super.finally(() => asyncOperationManager.dec());
+              }
+            }
+            LiveCodingPromise.prototype.constructor = Promise;
+            this.Promise = LiveCodingPromise;
+
+            // SetTimeout
+            const nativeSetTimeout = setTimeout;
+            const liveCodingSetTimeout = (cb, ...args) => {
+              const timeout = nativeSetTimeout(() => {
+                  cb();
+                  asyncOperationManager.dec();
+                  timersSet.delete(timeout);
+              }, ...args);
+              asyncOperationManager.inc();
+              timersSet.add(timeout);
+            }
+            setTimeout = liveCodingSetTimeout;
+
+            // SetInterval
+            const nativeSetInterval = setInterval;
+            const liveCodingSetInterval = (...args) => {
+              const interval = nativeSetInterval(...args);
+              asyncOperationManager.inc();
+              timersSet.add(interval);
+              return interval;
+            }
+            setInterval = liveCodingSetInterval;
+
+            // clearInterval
+            const nativeClearInterval = clearInterval;
+            const liveCodingClearInterval = (id) => {
+              asyncOperationManager.dec();
+              timersSet.delete(id);
+              return nativeClearInterval(id)
+            }
+            clearInterval = liveCodingClearInterval;
+
+            // clearTimeout
+            const nativeclearTimeout = clearTimeout;
+            const liveCodingClearTimeout = (id) => {
+              asyncOperationManager.dec();
+              timersSet.delete(id);
+              return nativeclearTimeout(id)
+            }
+            clearTimeout = liveCodingClearTimeout;
+
+
             //with (sandboxProxy) {
                 (function() {
-                    try {
                         ${codeToInject};
-                    } catch (e) {
-                        console.error(e);
-                    }
                 }).call('Nice try but try smth else ;)')
             //}
             
@@ -120,7 +258,9 @@ export class TerminalWidgetService {
                 if (key === Symbol.unscopables) return undefined;
                 return target[key];
             }
+
             
+        
             function patchConsoleMethod(name) {
                 const nativeMethod = console[name].bind(console);
                 
@@ -136,21 +276,38 @@ export class TerminalWidgetService {
                         
                         return attr;
                     })
-                
-                    nativePostMessage(JSON.stringify({type: name, data: attributes}));
-                    
+                    actions.push({type: name, data: [...attributes]});
+                   
+                    // let endTime = performance.now();
+                    // if(endTime - startTime >= bufferTime) {
+                      // startTime = performance.now();
+                      nativePostMessage(JSON.stringify({ type: ${EExecutionEvents.client}, data: actions}));
+                      actions = [];
+                    // }
+
                     // nativeMethod(...attributes);
                 }
             }
-        
-            nativePostMessage(JSON.stringify({type: 'success', data: actions}));
+            nativePostMessage(JSON.stringify({ type: ${EExecutionEvents.syncComplete}, data: null }));
         }`;
   }
 
   private getCodeBlob(code: string): any {
-    const blob = new Blob([this.getWorkerCode(code)], {
+    const jsCode = this.tsToMinifiedJs(code);
+    const blob = new Blob([this.getWorkerCode(jsCode)], {
       type: 'text/javascript',
     });
     return URL.createObjectURL(blob);
+  }
+
+  private tsToMinifiedJs(code: string): string {
+    let { outputText: jsCode } = transpileModule(code, {
+      compilerOptions: {
+        module: ModuleKind.CommonJS,
+        allowJs: true,
+        removeComments: true,
+      },
+    });
+    return jsCode;
   }
 }

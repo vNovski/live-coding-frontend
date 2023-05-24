@@ -2,7 +2,7 @@
     <div class="controls">
         <button (click)="onExecute()" class="execute-btn icon-button"
             mat-icon-button>
-            <mat-icon>play_arrow</mat-icon>
+            <mat-icon>{{ isRunning ? 'pause' : 'play_arrow' }}</mat-icon>
         </button>
         <button [matMenuTriggerFor]="menu" class="settings-btn icon-button"
             mat-icon-button>

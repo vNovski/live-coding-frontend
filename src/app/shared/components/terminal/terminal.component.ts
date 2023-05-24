@@ -19,7 +19,7 @@ import { Editor, EditorChange, EditorFromTextArea, Position, ScrollInfo } from '
 import { js_beautify } from 'js-beautify';
 import { isNill } from 'src/app/core/utils/isNill';
 
-import { TerminalShortcuts } from './enums/terminal-shortcuts.enum';
+import { ETerminalShortcuts } from './enums/terminal-shortcuts.enum';
 
 // @ts-ignore
 
@@ -264,8 +264,8 @@ export class TerminalComponent implements AfterViewInit, OnDestroy, ControlValue
       {
         ...this._options,
         extraKeys: {
-          [TerminalShortcuts.format]: this.beautify,
-          [TerminalShortcuts.comment]: this.comment
+          [ETerminalShortcuts.format]: this.beautify,
+          [ETerminalShortcuts.comment]: this.comment
         },
       }
     ) as EditorFromTextArea;

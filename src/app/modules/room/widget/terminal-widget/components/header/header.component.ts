@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 
 import { ShortcutsDialogComponent } from '../shortcuts-dialog/shortcuts-dialog.component';
@@ -10,6 +10,8 @@ import { AboutUsDialogComponent } from '../about-us-dialog/about-us-dialog.compo
   styleUrls: ['./header.component.scss']
 })
 export class HeaderComponent implements OnInit {
+  @Input() isRunning: boolean = false;
+
   @Output() execute = new EventEmitter<void>();
   @Output() watch = new EventEmitter<boolean>();
   @Output() toggleFullScreen = new EventEmitter<boolean>();
@@ -20,8 +22,7 @@ export class HeaderComponent implements OnInit {
   fullscreenStatus = false;
   watchStatus = false;
 
-  ngOnInit(): void {
-  }
+  ngOnInit(): void {}
 
 
   onToggleFullScreen(): void {

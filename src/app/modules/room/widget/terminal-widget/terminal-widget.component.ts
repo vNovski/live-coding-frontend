@@ -24,8 +24,8 @@ import {
   takeUntil,
   throttleTime,
 } from 'rxjs';
-import { TerminalLogTypes } from 'src/app/shared/components/terminal/enums/terminal-log-types.enum';
-import { TerminalLog } from 'src/app/shared/components/terminal/interfaces/terminal-log.interface';
+import { ETerminalLogTypes, terminalLogTypes } from 'src/app/shared/components/terminal/enums/terminal-log-types.enum';
+import { ITerminalLog } from 'src/app/shared/components/terminal/interfaces/terminal-log.interface';
 import { LogService } from './services/log.service';
 import { TerminalWidgetService } from './services/terminal-widget.service';
 import { FormBuilder } from '@angular/forms';
@@ -72,7 +72,7 @@ export class TerminalWidgetComponent
 
   @Input('otherMouseMove') otherMouseMove: any;
   @Input('otherMouses') otherMouses: string[] = [];
-  @Input('otherLog') set otherLog(otherLog: TerminalLog) {
+  @Input('otherLog') set otherLog(otherLog: ITerminalLog) {
     if (isNill(otherLog)) {
       return;
     }
@@ -80,7 +80,7 @@ export class TerminalWidgetComponent
   }
 
   @Output() fullscreenChange = new EventEmitter<boolean>();
-  @Output() logsChange = new EventEmitter<TerminalLog>();
+  @Output() logsChange = new EventEmitter<ITerminalLog>();
   @Output() edit = new EventEmitter<TerminalChange>();
   @Output() cursorChange = new EventEmitter<any>();
   @Output() selectionChange = new EventEmitter<{
@@ -163,9 +163,11 @@ export class TerminalWidgetComponent
   execute(): void {
     this.terminalWidgetService
       .eval(this.contentControl!.value.value || this.contentControl!.value) // TODO: Get rid of this shit 
-      .subscribe((log) => {
-        this.logsChange.emit(log);
-        this.log(log);
+      .subscribe((logs) => {
+        for(let log of logs) {
+          this.logsChange.emit(log);
+          this.log(log);
+        }
       });
   }
 
@@ -209,18 +211,18 @@ export class TerminalWidgetComponent
       });
   }
 
-  private log(log: TerminalLog): void {
+  private log(log: ITerminalLog): void {
     switch (log.type) {
-      case TerminalLogTypes.log:
+      case ETerminalLogTypes.log:
         this.logService.log(log.data);
         break;
-      case TerminalLogTypes.error:
+      case ETerminalLogTypes.error:
         this.logService.error(log.data);
         break;
-      case TerminalLogTypes.warn:
+      case ETerminalLogTypes.warn:
         this.logService.warn(log.data);
         break;
-      case TerminalLogTypes.info:
+      case ETerminalLogTypes.info:
         this.logService.info(log.data);
         break;
       default:

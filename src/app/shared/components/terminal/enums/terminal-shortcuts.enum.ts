@@ -1,4 +1,4 @@
-export enum TerminalShortcuts {
+export enum ETerminalShortcuts {
     format = 'Ctrl-Alt-F',
     comment = 'Ctrl-/'
 }
