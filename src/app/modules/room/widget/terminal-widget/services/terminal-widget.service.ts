@@ -118,7 +118,7 @@ export class TerminalWidgetService {
       tap(() => {
         if (!isDevtoolsOpen()) {
           this.snackBar.openFromComponent(SnackbarComponent, {
-            duration: 100000,
+            duration: 5000,
             data: `
             <div class='open-devtools-snackbar'>
               <p>

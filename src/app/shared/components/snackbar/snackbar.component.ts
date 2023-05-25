@@ -12,4 +12,8 @@ export class SnackbarComponent {
     @Inject(MAT_SNACK_BAR_DATA) public data: any
   ) {}
 
+  close() {
+    this.sbRef.dismiss();
+  }
+
 }
