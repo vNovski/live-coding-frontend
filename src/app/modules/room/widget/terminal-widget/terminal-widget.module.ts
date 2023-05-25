@@ -26,7 +26,7 @@ import { AboutUsDialogComponent } from './components/about-us-dialog/about-us-di
     FormsModule,
     ReactiveFormsModule,
     MaterialModule,
-    SharedModule
+    SharedModule,
   ],
   exports: [
     CommonModule,

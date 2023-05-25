@@ -1,7 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 
 @Component({
-  selector: 'app-empty',
+  selector: 'app-snackbar',
   templateUrl: './empty.component.html',
   styleUrls: ['./empty.component.scss']
 })

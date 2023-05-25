@@ -173,3 +173,25 @@ input {
     padding: 2px 5px;
   }
 }
+
+.open-devtools-snackbar {
+  p:nth-of-type(1) {
+    font-weight: 500;
+    font-size: 16px;
+  }
+  p:nth-of-type(2) {
+    font-size: 12px;
+    color: #ccc;
+
+    code {
+      margin-left: 5px;
+      font-size: 14px;
+    }
+  }
+}
+
+code {
+  background: var(--container-background-color);
+  border: 1px solid #3d4950;
+  padding: 5px;
+}

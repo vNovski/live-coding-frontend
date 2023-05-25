@@ -83,6 +83,7 @@
 
   .controls {
     z-index: 5;
+    display: flex;
     transition: var(--transition);
   }
 
@@ -105,7 +106,43 @@
     }
 
     &.execute-btn {
+      overflow: hidden;
+      position: relative;
+
+      &.active {
+        .mat-icon {
+          color: #546e7a !important;
+        }
+
+        &::before,
+        &::after {
+          content: "";
+          animation: growAndFade 2s infinite ease-in-out;
+          background-color: #546e7a;
+          border-radius: 50%;
+          height: 100%;
+          opacity: 0;
+          position: absolute;
+          width: 100%;
+          top: 0;
+          left: 0;
+          border-radius: 12px;
+        }
+
+        &::before {
+          animation-delay: 0s;
+        }
+
+        &::after {
+          animation-delay: 1s;
+        }
+      }
+
       .mat-icon {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
         transition: all 0.2s ease-in-out;
         line-height: 30px;
         width: 30px;
@@ -145,5 +182,16 @@
         }
       }
     }
+  }
+}
+
+@keyframes growAndFade {
+  0% {
+    opacity: 0.2;
+    transform: scale(0.4);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.2);
   }
 }

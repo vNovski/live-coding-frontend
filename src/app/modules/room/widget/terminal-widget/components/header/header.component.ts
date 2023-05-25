@@ -1,13 +1,17 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 
 import { ShortcutsDialogComponent } from '../shortcuts-dialog/shortcuts-dialog.component';
 import { AboutUsDialogComponent } from '../about-us-dialog/about-us-dialog.component';
+import { fadeInOut } from 'src/app/core/animations/fade-in-out.animation';
 
 @Component({
   selector: 'app-terminal-widget-header',
   templateUrl: './header.component.html',
-  styleUrls: ['./header.component.scss']
+  styleUrls: ['./header.component.scss'],
+  animations: [
+    fadeInOut(300, 200, false)
+  ]
 })
 export class HeaderComponent implements OnInit {
   @Input() isRunning: boolean = false;
@@ -24,6 +28,7 @@ export class HeaderComponent implements OnInit {
 
   ngOnInit(): void {}
 
+ 
 
   onToggleFullScreen(): void {
     this.fullscreenStatus = !this.fullscreenStatus;

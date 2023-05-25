@@ -1,8 +1,10 @@
 <header class="terminal-widget-header">
     <div class="controls">
-        <button (click)="onExecute()" class="execute-btn icon-button"
+        <button (click)="onExecute()" [class.active]="isRunning"
+            class="execute-btn icon-button"
             mat-icon-button>
-            <mat-icon>{{ isRunning ? 'pause' : 'play_arrow' }}</mat-icon>
+            <mat-icon [@fadeInOut]  *ngIf="isRunning">pause</mat-icon>
+            <mat-icon [@fadeInOut]  *ngIf="!isRunning">play_arrow</mat-icon>
         </button>
         <button [matMenuTriggerFor]="menu" class="settings-btn icon-button"
             mat-icon-button>

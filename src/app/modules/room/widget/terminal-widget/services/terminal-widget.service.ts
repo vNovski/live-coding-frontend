@@ -35,6 +35,8 @@ import { transpileModule, ModuleKind } from 'typescript';
 import { ETerminalLogTypes } from 'src/app/shared/components/terminal/enums/terminal-log-types.enum';
 import { IAsyncOperation } from 'src/app/shared/components/terminal/interfaces/terminal-asyncOperation.interface';
 import { EExecutionEvents } from 'src/app/shared/components/terminal/enums/terminal-executon-events.enum';
+import { isDevtoolsOpen } from 'src/app/core/utils/checkIfDevtoolsOpen';
+import { SnackbarComponent } from 'src/app/shared/components/snackbar/snackbar.component';
 
 function bufferDebounceTime(
   time: number = 0
@@ -84,9 +86,14 @@ export class TerminalWidgetService {
       this.terminateWorker();
     }
 
-    this.isWorkerAlive$.next(true);
+    const jsCode = this.tsToMinifiedJs(code);
+    if (!jsCode) {
+      this.terminateWorker();
+      return of([]);
+    }
 
-    this.worker = new Worker(this.getCodeBlob(code));
+    this.isWorkerAlive$.next(true);
+    this.worker = new Worker(this.getCodeBlob(jsCode));
 
     const workerEvents$ = fromEvent<MessageEvent>(this.worker, 'message').pipe(
       observeOn(asyncScheduler),
@@ -107,9 +114,26 @@ export class TerminalWidgetService {
       ),
       take(2),
       reduce((acc) => acc + 1, 0),
-      tap(() => this.terminateWorker())
-    )
-
+      tap(() => this.terminateWorker()),
+      tap(() => {
+        if (!isDevtoolsOpen()) {
+          this.snackBar.openFromComponent(SnackbarComponent, {
+            duration: 100000,
+            data: `
+            <div class='open-devtools-snackbar'>
+              <p>
+                Please Open DevTools to see the result
+              </p>
+              <p>
+                To open DevTools press <code> Ctrl + Shift + I </code>
+              </p>
+            </div>`,
+            panelClass: ['info'],
+          });
+        
+        }
+      })
+    );
 
     const clientError$ = fromEvent<ErrorEvent>(this.worker, 'error').pipe(
       tap((error) => {
@@ -136,7 +160,6 @@ export class TerminalWidgetService {
   }
 
   private terminateWorker() {
-    console.log('kill');
     this.isWorkerAlive$.next(false);
     this.worker?.terminate();
     this.worker = null;
@@ -200,7 +223,7 @@ export class TerminalWidgetService {
               }
             }
             LiveCodingPromise.prototype.constructor = Promise;
-            this.Promise = LiveCodingPromise;
+            Promise = LiveCodingPromise;
 
             // SetTimeout
             const nativeSetTimeout = setTimeout;
@@ -289,11 +312,13 @@ export class TerminalWidgetService {
                 }
             }
             nativePostMessage(JSON.stringify({ type: ${EExecutionEvents.syncComplete}, data: null }));
+            if(asyncOperationManager.counter === 0) {
+              asyncOperationManager.shareUpdate();
+            }
         }`;
   }
 
-  private getCodeBlob(code: string): any {
-    const jsCode = this.tsToMinifiedJs(code);
+  private getCodeBlob(jsCode: string): any {
     const blob = new Blob([this.getWorkerCode(jsCode)], {
       type: 'text/javascript',
     });
