@@ -1,64 +1,34 @@
 import { Injectable } from '@angular/core';
-import { SocketService } from 'src/app/core/services/socket/socket.service';
-import { ITerminalLog } from 'src/app/shared/components/terminal/interfaces/terminal-log.interface';
-import { TermianlEvents } from '../../enums/terminal-events.enum';
 import {
-  catchError,
+  asyncScheduler,
+  BehaviorSubject,
+  fromEvent,
+  merge,
+  Observable,
+  of,
+  OperatorFunction,
+} from 'rxjs';
+import {
   debounceTime,
   filter,
-  finalize,
   map,
   observeOn,
   reduce,
-  scan,
-  switchMap,
   take,
   takeUntil,
   tap,
 } from 'rxjs/operators';
-import {
-  fromEvent,
-  Observable,
-  throwError,
-  timer,
-  of,
-  asyncScheduler,
-  queueScheduler,
-  OperatorFunction,
-  combineLatest,
-  merge,
-  BehaviorSubject,
-  Subject,
-} from 'rxjs';
 import { SnackbarService } from 'src/app/core/services/snackbar.service';
-import { transpileModule, ModuleKind } from 'typescript';
-import { ETerminalLogTypes } from 'src/app/shared/components/terminal/enums/terminal-log-types.enum';
-import { IAsyncOperation } from 'src/app/shared/components/terminal/interfaces/terminal-asyncOperation.interface';
-import { EExecutionEvents } from 'src/app/shared/components/terminal/enums/terminal-executon-events.enum';
 import { isDevtoolsOpen } from 'src/app/core/utils/checkIfDevtoolsOpen';
 import { SnackbarComponent } from 'src/app/shared/components/snackbar/snackbar.component';
-
-function bufferDebounceTime(
-  time: number = 0
-): OperatorFunction<MessageEvent, ITerminalLog[]> {
-  return (source: Observable<MessageEvent>) => {
-    let bufferedValues: ITerminalLog[] = [];
-
-    return source.pipe(
-      tap((value) => bufferedValues.push(<ITerminalLog>JSON.parse(value.data))),
-      debounceTime(time),
-      map(() => bufferedValues),
-      tap(() => console.log(bufferedValues)),
-      tap(() => (bufferedValues = []))
-    );
-  };
-}
+import { EExecutionEvents } from 'src/app/shared/components/terminal/enums/terminal-executon-events.enum';
+import { ITerminalLog } from 'src/app/shared/components/terminal/interfaces/terminal-log.interface';
+import { ModuleKind, transpileModule } from 'typescript';
 
 @Injectable()
 export class TerminalWidgetService {
   private isWorkerAlive$ = new BehaviorSubject(false);
   private worker: Worker | null = null;
-  private workerLiveTime = 5000; // in ms
 
   public readonly isRunning$ = this.isWorkerAlive$.asObservable();
 
@@ -85,6 +55,7 @@ export class TerminalWidgetService {
     if (this.worker) {
       this.terminateWorker();
     }
+    this.showModalIfDevToolsIsClosed();
 
     const jsCode = this.tsToMinifiedJs(code);
     if (!jsCode) {
@@ -97,6 +68,9 @@ export class TerminalWidgetService {
 
     const workerEvents$ = fromEvent<MessageEvent>(this.worker, 'message').pipe(
       observeOn(asyncScheduler),
+      takeUntil(
+        this.isWorkerAlive$.pipe(filter((isWorkerAlive) => !isWorkerAlive))
+      ),
       map(
         (
           e
@@ -115,24 +89,6 @@ export class TerminalWidgetService {
       take(2),
       reduce((acc) => acc + 1, 0),
       tap(() => this.terminateWorker()),
-      tap(() => {
-        if (!isDevtoolsOpen()) {
-          this.snackBar.openFromComponent(SnackbarComponent, {
-            duration: 5000,
-            data: `
-            <div class='open-devtools-snackbar'>
-              <p>
-                Please Open DevTools to see the result
-              </p>
-              <p>
-                To open DevTools press <code> Ctrl + Shift + I </code>
-              </p>
-            </div>`,
-            panelClass: ['info'],
-          });
-        
-        }
-      })
     );
 
     const clientError$ = fromEvent<ErrorEvent>(this.worker, 'error').pipe(
@@ -197,8 +153,8 @@ export class TerminalWidgetService {
         onmessage = (message) => {
             const nativePostMessage = this.postMessage;
             const asyncOperationManager = new AsyncOperationsManager(nativePostMessage);
-            const bufferTime = 100 // ms;
-            let startTime = performance.now();
+            // const bufferTime = 100 // ms;
+            // let startTime = performance.now();
             let actions = [];
             const unit = message.data;
             
@@ -316,6 +272,24 @@ export class TerminalWidgetService {
               asyncOperationManager.shareUpdate();
             }
         }`;
+  }
+
+  private showModalIfDevToolsIsClosed() {
+    if (!isDevtoolsOpen()) {
+      this.snackBar.openFromComponent(SnackbarComponent, {
+        duration: 5000,
+        data: `
+        <div class='open-devtools-snackbar'>
+          <p>
+            Please Open DevTools to see the result
+          </p>
+          <p>
+            To open DevTools press <code> Ctrl + Shift + I </code>
+          </p>
+        </div>`,
+        panelClass: ['info'],
+      });
+    }
   }
 
   private getCodeBlob(jsCode: string): any {
