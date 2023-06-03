@@ -1,72 +1,72 @@
 @import "../../../theme/index.scss";
 
 .container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
 }
 
 .container-wrapper {
-    position: relative;
-    width: 100%;
-    height: 100vh;
+  position: relative;
+  width: 100%;
+  height: 100vh;
 }
 
 .support-btn {
-    background: var(--container-background-color);
-    transition: var(--transition);
+  background: var(--container-background-color);
+  transition: var(--transition);
+  box-shadow: var(--shadow);
+  position: absolute;
+  bottom: 1rem;
+  right: 1rem;
+  z-index: 5;
+
+  &:hover {
     box-shadow: var(--shadow);
-    position: absolute;
-    bottom: 1rem;
-    right: 1rem;
-    z-index: 5;
-    
-    &:hover {
-        box-shadow: var(--shadow);
-        filter: brightness(1.1);
-    }
+    filter: brightness(1.1);
+  }
 }
 
 .logout-btn {
-    transform: scale(-1);
-    transition: var(--transition);
-    box-shadow: inset var(--shadow);
-    position: absolute;
-    top: 1rem;
-    left: 1rem;
-    z-index: 5;
+  transform: scale(-1);
+  transition: var(--transition);
+  box-shadow: inset var(--shadow);
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  z-index: 5;
 
-    &.hide {
-        opacity: 0;
-        pointer-events: none;
-    }
+  &.fullscreen {
+    top: 6px;
+    left: 10px;
+  }
 }
 
 ::ng-deep .contact-support-dialog {
-    max-width: 100vw;
-    max-height: 100vh;
-    text-align: center;
-  
-    @include for-phone-only {
-      width: 100vw;
-    }
-  
-    @include for-tablet-portrait-up {
-      width: 50vw;
-    }
-  
-    @include for-desktop-up {
-      width: 30%;
-    }
-  
-    .mat-dialog-container {
-      position: relative;
-      background-color: var(--background-color);
-      margin: 0;
-      padding-left: 0;
-      padding-right: 0;
-      padding-bottom: 0;
-      overflow: hidden;
-    }
+  max-width: 100vw;
+  max-height: 100vh;
+  text-align: center;
+
+  @include for-phone-only {
+    width: 100vw;
   }
+
+  @include for-tablet-portrait-up {
+    width: 50vw;
+  }
+
+  @include for-desktop-up {
+    width: 30%;
+  }
+
+  .mat-dialog-container {
+    position: relative;
+    background-color: var(--background-color);
+    margin: 0;
+    padding-left: 0;
+    padding-right: 0;
+    padding-bottom: 0;
+    overflow: hidden;
+  }
+}
