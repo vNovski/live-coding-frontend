@@ -14,6 +14,7 @@ import {
   map,
   observeOn,
   reduce,
+  skip,
   take,
   takeUntil,
   tap,
@@ -86,9 +87,9 @@ export class TerminalWidgetService {
           type === EExecutionEvents.syncComplete ||
           type === EExecutionEvents.asyncComplete
       ),
-      take(2),
-      reduce((acc) => acc + 1, 0),
-      tap(() => this.terminateWorker()),
+      take(2), // complete stream after receiving status about sync and async operations 
+      skip(1), // skip first value because we use syncAndAsyncCompleteEvent$ in TakeUntil so we wanna trigger emit only onse when everything is completed
+      tap(() => this.terminateWorker())
     );
 
     const clientError$ = fromEvent<ErrorEvent>(this.worker, 'error').pipe(
@@ -102,11 +103,7 @@ export class TerminalWidgetService {
     );
 
     const clientEvents$ = workerEvents$.pipe(
-      takeUntil(
-        syncAndAsyncCompleteEvent$.pipe(
-          filter((completedOperations) => completedOperations === 2)
-        )
-      ),
+      takeUntil(syncAndAsyncCompleteEvent$),
       filter(({ type }) => type === EExecutionEvents.client),
       map(({ data }) => data as ITerminalLog[])
     );
