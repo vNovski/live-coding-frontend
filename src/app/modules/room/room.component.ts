@@ -46,8 +46,6 @@ function roomServiceFactory(
   ],
 })
 export class RoomComponent implements OnInit, OnDestroy {
-  code = '';
-
   communicationEventTypes = CommunicationEventTypes;
   roomId: string | null = null;
   hideLeaveBtn = false;
@@ -71,12 +69,12 @@ export class RoomComponent implements OnInit, OnDestroy {
     this.route.params.subscribe((params) => {
       const id = params['id'];
       this.roomId = id;
-      this.roomService.available$
-        .pipe(filter((status) => status))
-        .subscribe(() => {
-          this.roomService.joinRoom();
-        });
     });
+    this.roomService.available$
+      .pipe(filter((status) => status))
+      .subscribe(() => {
+        this.roomService.joinRoom();
+      });
   }
 
   onLogsChange(log: ITerminalLog): void {

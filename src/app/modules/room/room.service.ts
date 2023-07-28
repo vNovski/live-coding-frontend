@@ -1,33 +1,20 @@
 import { Inject, Injectable } from '@angular/core';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import {
-  BehaviorSubject,
-  filter,
-  map,
-  Observable,
-  take,
-  tap,
-  withLatestFrom,
-} from 'rxjs';
+import { BehaviorSubject, filter, map, Observable, take, tap, withLatestFrom } from 'rxjs';
 import { SnackbarService } from 'src/app/core/services/snackbar.service';
 import { SocketService } from 'src/app/core/services/socket/socket.service';
-import {
-  IUserInfo as IUser,
-  UserService,
-} from 'src/app/core/services/user/user.service';
-import { ConnectionSnackbarComponent } from 'src/app/shared/components/connection-snackbar/connection-snackbar.component';
+import { IUserInfo as IUser, UserService } from 'src/app/core/services/user/user.service';
+import { IMousePosition } from 'src/app/shared/components/terminal/interfaces/mouse-position.interface';
 import { ITerminalLog } from 'src/app/shared/components/terminal/interfaces/terminal-log.interface';
+
 import { RoomEvents } from './enums/room-events.enum';
-import { RoomModule } from './room.module';
 import { TermianlEvents } from './widget/enums/terminal-events.enum';
 import { TerminalChange } from './widget/terminal-widget/interfaces/terminal-change.interface';
+import { ICursorPosition } from 'src/app/shared/components/terminal/interfaces/cursor-position';
 
 @Injectable()
 export class RoomService {
-  id: string;
-  public _connections$: BehaviorSubject<IUser[]> = new BehaviorSubject<IUser[]>(
-    []
-  );
+  id!: string; // room id
+  public _connections$: BehaviorSubject<IUser[]> = new BehaviorSubject<IUser[]>([]);
 
   public connect$ = this.socketService.on(RoomEvents.join);
   public disconnect$ = this.socketService.on(RoomEvents.leave);
@@ -149,14 +136,14 @@ export class RoomService {
     }
   }
 
-  mouseMove(position: any): void {
+  mouseMove(position: IMousePosition): void {
     this.socketService.emit(TermianlEvents.mouseMove, {
       roomId: this.id,
       position,
     });
   }
 
-  cursorChange(position: any): void {
+  cursorChange(position: ICursorPosition): void {
     this.socketService.emit(TermianlEvents.cursorChange, {
       roomId: this.id,
       position,
@@ -164,6 +151,7 @@ export class RoomService {
   }
 
   selectionChange(position: any): void {
+    console.log('selection', position)
     this.socketService.emit(TermianlEvents.selectionChange, {
       roomId: this.id,
       position,
