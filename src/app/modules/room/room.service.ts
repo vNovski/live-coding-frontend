@@ -151,7 +151,6 @@ export class RoomService {
   }
 
   selectionChange(position: any): void {
-    console.log('selection', position)
     this.socketService.emit(TermianlEvents.selectionChange, {
       roomId: this.id,
       position,

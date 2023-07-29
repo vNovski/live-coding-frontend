@@ -15,7 +15,13 @@ import {
   ViewChild,
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { Editor, EditorChange, EditorFromTextArea, Position, ScrollInfo } from 'codemirror';
+import {
+  Editor,
+  EditorChange,
+  EditorFromTextArea,
+  Position,
+  ScrollInfo,
+} from 'codemirror';
 import { js_beautify } from 'js-beautify';
 import { isNill } from 'src/app/core/utils/isNill';
 
@@ -33,7 +39,6 @@ function normalizeLineEndings(str: string): string {
 declare var require: any;
 declare var CodeMirror: any;
 
-
 @Component({
   selector: 'app-terminal',
   templateUrl: './terminal.component.html',
@@ -48,7 +53,9 @@ declare var CodeMirror: any;
   preserveWhitespaces: false,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TerminalComponent implements AfterViewInit, OnDestroy, ControlValueAccessor, DoCheck {
+export class TerminalComponent
+  implements AfterViewInit, OnDestroy, ControlValueAccessor, DoCheck
+{
   /* class applied to the created textarea */
   @Input() className = '';
   /* name applied to the created textarea */
@@ -57,11 +64,11 @@ export class TerminalComponent implements AfterViewInit, OnDestroy, ControlValue
   @Input() autoFocus = true;
 
   @Input() set change(change: EditorChange | null) {
-    if(isNill(change)) {
+    if (isNill(change)) {
       return;
     }
     this.applyChange(change!);
-  };
+  }
 
   /**
    * set options for codemirror
@@ -82,6 +89,9 @@ export class TerminalComponent implements AfterViewInit, OnDestroy, ControlValue
   @Output() cursorActivity = new EventEmitter<Editor>();
   /* called when the editor is focused or loses focus */
   @Output() focusChange = new EventEmitter<boolean>();
+
+  /* called when the editor text is changed */
+  @Output() onchange = new EventEmitter<EditorChange & { ignore: boolean }>();
   /* called when the editor is scrolled */
   @Output() scroll = new EventEmitter<ScrollInfo>();
   /* called when file(s) are dropped */
@@ -98,7 +108,6 @@ export class TerminalComponent implements AfterViewInit, OnDestroy, ControlValue
    * either global variable or required library
    */
   private _codeMirror: any;
-  private initialChange = false;
 
   private _differ?: KeyValueDiffer<string, any>;
   private _options: any = {
@@ -108,7 +117,7 @@ export class TerminalComponent implements AfterViewInit, OnDestroy, ControlValue
     indentUnit: 2,
   };
 
-  constructor(private _differs: KeyValueDiffers, private _ngZone: NgZone) { }
+  constructor(private _differs: KeyValueDiffers, private _ngZone: NgZone) {}
 
   get codeMirrorGlobal(): any {
     if (this._codeMirror) {
@@ -116,22 +125,29 @@ export class TerminalComponent implements AfterViewInit, OnDestroy, ControlValue
     }
 
     // in order to allow for universal rendering, we import Codemirror runtime with `require` to prevent node errors
-    this._codeMirror = typeof CodeMirror !== 'undefined' ? CodeMirror : import('codemirror');
+    this._codeMirror =
+      typeof CodeMirror !== 'undefined' ? CodeMirror : import('codemirror');
     return this._codeMirror;
   }
 
   ngAfterViewInit() {
     this._ngZone.runOutsideAngular(async () => {
       this.codeMirror = await this.createEditor();
-      
-      this.codeMirror.on('cursorActivity', cm => this._ngZone.run(() => this.cursorActive(cm)));
+
+      this.codeMirror.on('cursorActivity', (cm) =>
+        this._ngZone.run(() => this.cursorActive(cm))
+      );
       this.codeMirror.on('scroll', this.scrollChanged.bind(this));
-      this.codeMirror.on('blur', (cm) => this._ngZone.run(() => this.focusChanged(cm, false)));
-      this.codeMirror.on('focus', (cm) => this._ngZone.run(() => this.focusChanged(cm, true)));
+      this.codeMirror.on('blur', (cm) =>
+        this._ngZone.run(() => this.focusChanged(cm, false))
+      );
+      this.codeMirror.on('focus', (cm) =>
+        this._ngZone.run(() => this.focusChanged(cm, true))
+      );
       this.codeMirror.on('change', (cm, change) =>
         this._ngZone.run(() => {
           this.codemirrorValueChanged(cm, change);
-        }),
+        })
       );
       this.codeMirror.on('drop', (cm, e) => {
         this._ngZone.run(() => this.dropFiles(cm, e));
@@ -146,12 +162,14 @@ export class TerminalComponent implements AfterViewInit, OnDestroy, ControlValue
     // check options have not changed
     const changes = this._differ.diff(this._options);
     if (changes) {
-      changes.forEachChangedItem(option =>
-        this.setOptionIfChanged(option.key, option.currentValue),
+      changes.forEachChangedItem((option) =>
+        this.setOptionIfChanged(option.key, option.currentValue)
       );
-      changes.forEachAddedItem(option => this.setOptionIfChanged(option.key, option.currentValue));
-      changes.forEachRemovedItem(option =>
-        this.setOptionIfChanged(option.key, option.currentValue),
+      changes.forEachAddedItem((option) =>
+        this.setOptionIfChanged(option.key, option.currentValue)
+      );
+      changes.forEachRemovedItem((option) =>
+        this.setOptionIfChanged(option.key, option.currentValue)
       );
     }
   }
@@ -164,13 +182,9 @@ export class TerminalComponent implements AfterViewInit, OnDestroy, ControlValue
   codemirrorValueChanged(cm: Editor, change: EditorChange) {
     const cmVal = cm.getValue();
 
-    if(!this.initialChange) {
-      this.initialChange = true;
-      return;
-    }
-
     this.value = cmVal;
-    this.onChange({ value: this.value, change: change, ignore: change.origin === '+ignore' });
+    this.onchange.emit({ ...change, ignore: change.origin === '+ignore' || change.origin === 'setValue'  });
+    this.onChange(this.value);
   }
   setOptionIfChanged(optionName: string, newValue: any) {
     if (!this.codeMirror) {
@@ -195,7 +209,7 @@ export class TerminalComponent implements AfterViewInit, OnDestroy, ControlValue
     this.scroll.emit(cm.getScrollInfo());
   }
   cursorActive(cm: Editor) {
-    if(this.isFocused) {
+    if (this.isFocused) {
       this.cursorActivity.emit(cm);
     }
   }
@@ -225,17 +239,25 @@ export class TerminalComponent implements AfterViewInit, OnDestroy, ControlValue
       this.codeMirror.setCursor(prevCursorPosition);
     }
 
-    if (!isNill(value) && value !== cur && normalizeLineEndings(cur) !== normalizeLineEndings(value)) {
+    if (
+      !isNill(value) &&
+      value !== cur &&
+      normalizeLineEndings(cur) !== normalizeLineEndings(value)
+    ) {
       this.value = value;
       this.codeMirror.setValue(value);
     }
-
   }
 
   private applyChange(change: EditorChange): void {
     if (!isNill(change) && this.codeMirror) {
       this.lastChange = change;
-      this.codeMirror.replaceRange(change.text, change.from, change.to, '+ignore');
+      this.codeMirror.replaceRange(
+        change.text,
+        change.from,
+        change.to,
+        '+ignore'
+      );
       this.value = this.codeMirror.getValue();
       // this.onChange({ value: this.value, change: change });
     }
@@ -258,17 +280,16 @@ export class TerminalComponent implements AfterViewInit, OnDestroy, ControlValue
   private async createEditor(): Promise<EditorFromTextArea> {
     const codeMirrorObj = await this.codeMirrorGlobal;
 
-    const codeMirror = codeMirrorObj?.default ? codeMirrorObj.default : codeMirrorObj;
-    return codeMirror.fromTextArea(
-      this.ref.nativeElement,
-      {
-        ...this._options,
-        extraKeys: {
-          [ETerminalShortcuts.format]: this.beautify,
-          [ETerminalShortcuts.comment]: this.comment
-        },
-      }
-    ) as EditorFromTextArea;
+    const codeMirror = codeMirrorObj?.default
+      ? codeMirrorObj.default
+      : codeMirrorObj;
+    return codeMirror.fromTextArea(this.ref.nativeElement, {
+      ...this._options,
+      extraKeys: {
+        [ETerminalShortcuts.format]: this.beautify,
+        [ETerminalShortcuts.comment]: this.comment,
+      },
+    }) as EditorFromTextArea;
   }
 
   private comment(cm: Editor): void {
@@ -281,32 +302,34 @@ export class TerminalComponent implements AfterViewInit, OnDestroy, ControlValue
     if (uncomment) {
       text = lines.map((line: string) => line.slice(2)).join('\n');
     } else {
-      text = lines.map((line: string) => '//' + line).join('\n')
+      text = lines.map((line: string) => '//' + line).join('\n');
     }
     cm.replaceRange(text, from, to);
   }
 
   private beautify(cm: Editor): void {
-    cm.setValue(js_beautify(cm.getValue(), {
-      indent_size: 2,
-      indent_char: ' ',
-      max_preserve_newlines: 2,
-      preserve_newlines: true,
-      keep_array_indentation: false,
-      break_chained_methods: false,
-      brace_style: 'collapse',
-      space_before_conditional: true,
-      unescape_strings: false,
-      jslint_happy: false,
-      end_with_newline: false,
-      wrap_line_length: 0,
-      comma_first: false,
-      e4x: false,
-      indent_empty_lines: false
-    }));
+    cm.setValue(
+      js_beautify(cm.getValue(), {
+        indent_size: 2,
+        indent_char: ' ',
+        max_preserve_newlines: 2,
+        preserve_newlines: true,
+        keep_array_indentation: false,
+        break_chained_methods: false,
+        brace_style: 'collapse',
+        space_before_conditional: true,
+        unescape_strings: false,
+        jslint_happy: false,
+        end_with_newline: false,
+        wrap_line_length: 0,
+        comma_first: false,
+        e4x: false,
+        indent_empty_lines: false,
+      })
+    );
   }
   /** Implemented as part of ControlValueAccessor. */
-  private onChange = (_: any) => { };
+  private onChange = (_: any) => {};
   /** Implemented as part of ControlValueAccessor. */
-  private onTouched = () => { };
+  private onTouched = () => {};
 }

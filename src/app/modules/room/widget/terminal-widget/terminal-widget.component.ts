@@ -24,7 +24,10 @@ import {
   takeUntil,
   throttleTime,
 } from 'rxjs';
-import { ETerminalLogTypes, terminalLogTypes } from 'src/app/shared/components/terminal/enums/terminal-log-types.enum';
+import {
+  ETerminalLogTypes,
+  terminalLogTypes,
+} from 'src/app/shared/components/terminal/enums/terminal-log-types.enum';
 import { ITerminalLog } from 'src/app/shared/components/terminal/interfaces/terminal-log.interface';
 import { LogService } from './services/log.service';
 import { TerminalWidgetService } from './services/terminal-widget.service';
@@ -56,11 +59,12 @@ export class TerminalWidgetComponent
     if (isNill(data)) {
       return;
     }
-    
-    this.contentControl!.patchValue(data.value, { emitEvent: false });
+    this.terminalForm!.patchValue({ code: data.value}, { emitEvent: false });
   }
 
-  @Input('editorChange') editorChange: EditorChange | null = null;
+  @Input('editorChange') editorChange:
+    | (EditorChange & { ignore: boolean })
+    | null = null;
 
   @Input('otherSelection') set otherSelection(selection: any) {
     this.renderOtherSelections(selection);
@@ -94,7 +98,8 @@ export class TerminalWidgetComponent
   }>();
 
   terminalForm = this.fb.group({
-    content: '',
+    code: '',
+    change: null,
   });
 
   fullscreenStatus = false;
@@ -110,8 +115,8 @@ export class TerminalWidgetComponent
   private scroll$: BehaviorSubject<{ left: number; top: number }> =
     new BehaviorSubject<{ left: number; top: number }>({ left: 0, top: 0 });
 
-  get contentControl() {
-    return this.terminalForm.get('content');
+  get codeControl() {
+    return this.terminalForm.get('code');
   }
 
   outsideScreenIndicators: Map<string, OffScreenIndicator> = new Map();
@@ -140,6 +145,17 @@ export class TerminalWidgetComponent
     const from = editor.getCursor('from');
     const to = editor.getCursor('to');
 
+    if (
+      from.line === 0 &&
+      from.ch === 0 &&
+      from.sticky === null &&
+      to.line === 0 &&
+      to.ch === 0 &&
+      to.sticky === null
+    ) {
+      return;
+    }
+
     const cursorPos = editor.getCursor();
     this.cursorChange.emit(cursorPos);
 
@@ -161,11 +177,10 @@ export class TerminalWidgetComponent
   }
 
   execute(): void {
-    console.log(this.contentControl!.value.value, this.contentControl!.value, 'AAAA')
     this.terminalWidgetService
-      .eval(this.contentControl!.value.value || this.contentControl!.value) // TODO: Get rid of this shit 
+      .eval(this.codeControl!.value.value || this.codeControl!.value) // TODO: Get rid of this shit
       .subscribe((logs) => {
-        for(let log of logs) {
+        for (let log of logs) {
           this.logsChange.emit(log);
           this.log(log);
         }
@@ -185,7 +200,7 @@ export class TerminalWidgetComponent
   }
 
   download(): void {
-    this.terminalWidgetService.download(this.contentControl!.value.value);
+    this.terminalWidgetService.download(this.codeControl!.value.value);
   }
 
   private listenMouseMove() {
@@ -293,7 +308,7 @@ export class TerminalWidgetComponent
   }
 
   private listenWatchForm(): void {
-    this.terminalForm.valueChanges
+    this.codeControl!.valueChanges
       .pipe(
         debounceTime(3000),
         takeUntil(this.ngUnsubscribe),
@@ -305,13 +320,15 @@ export class TerminalWidgetComponent
   }
 
   private listenForm() {
-    this.terminalForm.valueChanges
+    this.codeControl!.valueChanges
       .pipe(takeUntil(this.ngUnsubscribe))
-      .subscribe(({ content }: { content: TerminalChange & { ignore: true } }) => {
-        if(content.ignore) { // if client recevied changes the he should npt sync these changes
+      .subscribe((code) => {
+        const change =  this.terminalForm.controls['change'].value;
+        if (change?.ignore) {
+          // if client recevied changes the he should npt sync these changes
           return;
         }
-        this.edit.emit(content);
+        this.edit.emit({ value: code, change: change! });
       });
   }
 

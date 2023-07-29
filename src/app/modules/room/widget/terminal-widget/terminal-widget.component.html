@@ -12,8 +12,9 @@
             [appMouseIndicators]="otherMouseMove" [activeMouses]="otherMouses">
             <div #terminalContainer class="terminal">
                 <form [formGroup]="terminalForm">
-                    <app-terminal #editor formControlName="content"
+                    <app-terminal #editor formControlName="code"
                         [change]="editorChange"
+                        (onchange)="terminalForm.controls['change'].patchValue($event)"
                         (focusChange)="focusChange($event)"
                         (cursorActivity)="onCursorActivity($event)"
                         (scroll)="onScrollChange($event)"></app-terminal>
