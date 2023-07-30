@@ -183,7 +183,7 @@ export class TerminalComponent
     const cmVal = cm.getValue();
 
     this.value = cmVal;
-    this.onchange.emit({ ...change, ignore: change.origin !== '+input'  });
+    this.onchange.emit({ ...change, ignore: change.origin === '+ignore' || change.origin === 'setValue'  });
     this.onChange(this.value);
   }
   setOptionIfChanged(optionName: string, newValue: any) {
