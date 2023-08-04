@@ -19,7 +19,7 @@ import { AboutUsDialogComponent } from './components/about-us-dialog/about-us-di
     ShortcutsDialogComponent,
     OnlineIndicatorComponent,
     TestComponent,
-    AboutUsDialogComponent,
+    AboutUsDialogComponent
   ],
   imports: [
     CommonModule,

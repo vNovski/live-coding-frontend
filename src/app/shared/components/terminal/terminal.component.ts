@@ -1,11 +1,13 @@
 import {
   AfterViewInit,
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   DoCheck,
   ElementRef,
   EventEmitter,
   forwardRef,
+  HostListener,
   Input,
   KeyValueDiffer,
   KeyValueDiffers,
@@ -26,6 +28,7 @@ import { js_beautify } from 'js-beautify';
 import { isNill } from 'src/app/core/utils/isNill';
 
 import { ETerminalShortcuts } from './enums/terminal-shortcuts.enum';
+import { TerminalService } from './services/terminal.service';
 
 // @ts-ignore
 
@@ -48,6 +51,7 @@ declare var CodeMirror: any;
       useExisting: forwardRef(() => TerminalComponent),
       multi: true,
     },
+    TerminalService
   ],
   styleUrls: ['./terminal.component.scss'],
   preserveWhitespaces: false,
@@ -98,6 +102,7 @@ export class TerminalComponent
   @Output() drop = new EventEmitter<[Editor, DragEvent]>();
 
   @ViewChild('ref') ref!: ElementRef<HTMLTextAreaElement>;
+  fileover = false;
   value = '';
   lastChange: EditorChange | null = null;
   disabled = false;
@@ -117,7 +122,11 @@ export class TerminalComponent
     indentUnit: 2,
   };
 
-  constructor(private _differs: KeyValueDiffers, private _ngZone: NgZone) {}
+  constructor(
+    private _differs: KeyValueDiffers,
+    private _ngZone: NgZone,
+    private cdRef: ChangeDetectorRef
+  ) {}
 
   get codeMirrorGlobal(): any {
     if (this._codeMirror) {
@@ -149,12 +158,52 @@ export class TerminalComponent
           this.codemirrorValueChanged(cm, change);
         })
       );
+     
+      let dragTargetCounter = 0;
+      let isCodeDragged = false;
+      document.querySelector('.CodeMirror-scroll')?.addEventListener('dragstart', (e) => {
+        e.stopPropagation();
+        isCodeDragged=true;
+      });
+
+      document.querySelector('.CodeMirror-scroll')?.addEventListener('dragend', (e) => {
+        e.stopPropagation();
+        isCodeDragged = false;
+      });
+
+      this.codeMirror.on('dragenter', (_, e) => {
+        if(isCodeDragged) return;
+        dragTargetCounter++;
+        this._ngZone.run(() => {
+          this.fileover = true;
+          this.cdRef.markForCheck();
+        });
+      });
+
+
+      this.codeMirror.on('dragleave', (_, e) => {
+        if(isCodeDragged) return;
+        this._ngZone.run(() => {
+          dragTargetCounter--;
+          if(dragTargetCounter === 0) {
+            this.fileover = false;
+            this.cdRef.markForCheck();
+          }
+        });
+      });
+
       this.codeMirror.on('drop', (cm, e) => {
-        this._ngZone.run(() => this.dropFiles(cm, e));
+        this._ngZone.run(() => {
+          this.fileover = false;
+          dragTargetCounter = 0;
+          this.dropFiles(cm, e);
+          this.cdRef.markForCheck();
+        });
       });
       this.codeMirror.setValue(this.value);
     });
   }
+
   ngDoCheck() {
     if (!this._differ) {
       return;
@@ -183,7 +232,10 @@ export class TerminalComponent
     const cmVal = cm.getValue();
 
     this.value = cmVal;
-    this.onchange.emit({ ...change, ignore: change.origin === '+ignore' || change.origin === 'setValue'  });
+    this.onchange.emit({
+      ...change,
+      ignore: change.origin === '+ignore' || change.origin === 'setValue',
+    });
     this.onChange(this.value);
   }
   setOptionIfChanged(optionName: string, newValue: any) {
