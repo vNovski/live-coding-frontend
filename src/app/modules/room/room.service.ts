@@ -3,13 +3,13 @@ import { BehaviorSubject, filter, map, Observable, take, tap, withLatestFrom } f
 import { SnackbarService } from 'src/app/core/services/snackbar.service';
 import { SocketService } from 'src/app/core/services/socket/socket.service';
 import { IUserInfo as IUser, UserService } from 'src/app/core/services/user/user.service';
-import { IMousePosition } from 'src/app/shared/components/terminal/interfaces/mouse-position.interface';
-import { ITerminalLog } from 'src/app/shared/components/terminal/interfaces/terminal-log.interface';
 
 import { RoomEvents } from './enums/room-events.enum';
 import { TermianlEvents } from './widget/enums/terminal-events.enum';
 import { TerminalChange } from './widget/terminal-widget/interfaces/terminal-change.interface';
-import { ICursorPosition } from 'src/app/shared/components/terminal/interfaces/cursor-position';
+import { ICursorPosition } from 'src/app/shared/modules/terminal/interfaces/cursor-position';
+import { IMousePosition } from 'src/app/shared/modules/terminal/interfaces/mouse-position.interface';
+import { ITerminalLog } from 'src/app/shared/modules/terminal/interfaces/terminal-log.interface';
 
 @Injectable()
 export class RoomService {

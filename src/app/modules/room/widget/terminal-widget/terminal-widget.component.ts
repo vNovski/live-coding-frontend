@@ -24,21 +24,19 @@ import {
   takeUntil,
   throttleTime,
 } from 'rxjs';
-import {
-  ETerminalLogTypes,
-  terminalLogTypes,
-} from 'src/app/shared/components/terminal/enums/terminal-log-types.enum';
-import { ITerminalLog } from 'src/app/shared/components/terminal/interfaces/terminal-log.interface';
+
 import { LogService } from './services/log.service';
 import { TerminalWidgetService } from './services/terminal-widget.service';
 import { FormBuilder } from '@angular/forms';
-import { TerminalComponent } from '../../../../shared/components/terminal/terminal.component';
 import addAlpha from '../../../../core/utils/addAlpha';
 import { TerminalChange } from './interfaces/terminal-change.interface';
 import { OffScreenIndicator } from './interfaces/off-screen-indicator.interface';
 import { EditorChange } from 'codemirror';
 import { isNill } from 'src/app/core/utils/isNill';
 import tippy from 'tippy.js';
+import { ETerminalLogTypes } from 'src/app/shared/modules/terminal/enums/terminal-log-types.enum';
+import { ITerminalLog } from 'src/app/shared/modules/terminal/interfaces/terminal-log.interface';
+import { TerminalComponent } from 'src/app/shared/modules/terminal/terminal.component';
 
 @Component({
   selector: 'app-terminal-widget',

@@ -12,11 +12,11 @@ import {
   SocketService,
 } from 'src/app/core/services/socket/socket.service';
 import { UserService } from 'src/app/core/services/user/user.service';
-import { ITerminalLog } from 'src/app/shared/components/terminal/interfaces/terminal-log.interface';
 import { RoomService } from './room.service';
 import { TerminalChange } from './widget/terminal-widget/interfaces/terminal-change.interface';
 import { ContactSupportDialogComponent } from './components/contact-support-dialog/contact-support-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
+import { ITerminalLog } from 'src/app/shared/modules/terminal/interfaces/terminal-log.interface';
 
 function roomServiceFactory(
   route: ActivatedRoute,

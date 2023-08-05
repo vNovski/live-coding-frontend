@@ -22,8 +22,8 @@ import {
 import { SnackbarService } from 'src/app/core/services/snackbar.service';
 import { isDevtoolsOpen } from 'src/app/core/utils/checkIfDevtoolsOpen';
 import { SnackbarComponent } from 'src/app/shared/components/snackbar/snackbar.component';
-import { EExecutionEvents } from 'src/app/shared/components/terminal/enums/terminal-executon-events.enum';
-import { ITerminalLog } from 'src/app/shared/components/terminal/interfaces/terminal-log.interface';
+import { EExecutionEvents } from 'src/app/shared/modules/terminal/enums/terminal-executon-events.enum';
+import { ITerminalLog } from 'src/app/shared/modules/terminal/interfaces/terminal-log.interface';
 import { ModuleKind, transpileModule } from 'typescript';
 
 @Injectable()
