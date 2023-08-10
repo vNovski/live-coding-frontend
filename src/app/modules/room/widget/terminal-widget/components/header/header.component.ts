@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
+import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 
 import { ShortcutsDialogComponent } from '../shortcuts-dialog/shortcuts-dialog.component';
 import { AboutUsDialogComponent } from '../about-us-dialog/about-us-dialog.component';

@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
 import { filter, map, Subject, takeUntil } from 'rxjs';
 import {
@@ -15,7 +15,7 @@ import { UserService } from 'src/app/core/services/user/user.service';
 import { RoomService } from './room.service';
 import { TerminalChange } from './widget/terminal-widget/interfaces/terminal-change.interface';
 import { ContactSupportDialogComponent } from './components/contact-support-dialog/contact-support-dialog.component';
-import { MatDialog } from '@angular/material/dialog';
+import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { ITerminalLog } from 'src/app/shared/modules/terminal/interfaces/terminal-log.interface';
 
 function roomServiceFactory(

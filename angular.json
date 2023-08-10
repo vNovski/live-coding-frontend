@@ -110,5 +110,8 @@
       }
     }
   },
-  "defaultProject": "live-cooding"
+  "cli": {
+    "analytics": "3202b8e3-bf0a-4ee2-8f2b-711ef68c37db",
+    "packageManager": "npm"
+  }
 }

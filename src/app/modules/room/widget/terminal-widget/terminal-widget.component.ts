@@ -27,7 +27,7 @@ import {
 
 import { LogService } from './services/log.service';
 import { TerminalWidgetService } from './services/terminal-widget.service';
-import { FormBuilder } from '@angular/forms';
+import { UntypedFormBuilder } from '@angular/forms';
 import addAlpha from '../../../../core/utils/addAlpha';
 import { TerminalChange } from './interfaces/terminal-change.interface';
 import { OffScreenIndicator } from './interfaces/off-screen-indicator.interface';
@@ -122,7 +122,7 @@ export class TerminalWidgetComponent
   constructor(
     public readonly terminalWidgetService: TerminalWidgetService,
     private readonly logService: LogService,
-    private readonly fb: FormBuilder,
+    private readonly fb: UntypedFormBuilder,
     private renderer: Renderer2
   ) {}
 
