@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
+import { MatDialog } from '@angular/material/dialog';
 
 import { ShortcutsDialogComponent } from '../shortcuts-dialog/shortcuts-dialog.component';
 import { AboutUsDialogComponent } from '../about-us-dialog/about-us-dialog.component';
@@ -50,7 +50,7 @@ export class HeaderComponent implements OnInit {
     const dialogRef = this.dialog.open(ShortcutsDialogComponent, {
       maxWidth: '50vw',
       maxHeight: '50vh',
-      panelClass: 'shortcuts-dialog'
+      panelClass: ['shortcuts-dialog', 'dialog']
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -61,7 +61,7 @@ export class HeaderComponent implements OnInit {
     const dialogRef = this.dialog.open(AboutUsDialogComponent, {
       maxWidth: '100vw',
       maxHeight: '100vh',
-      panelClass: 'about-us-dialog'
+      panelClass: ['about-us-dialog', 'dialog']
     });
   }
 

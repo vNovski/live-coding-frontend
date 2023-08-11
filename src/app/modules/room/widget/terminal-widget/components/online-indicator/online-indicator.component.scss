@@ -68,11 +68,11 @@
   }
 
   button {
-      color: var(--text-color) !important;
-      filter: brightness(0.9);
-      font-weight: 500;
-      font-size: 12px;
-      height: 19px;
+    background: var(--container-background-color);
+    color: var(--text-color);
+    font-weight: 500;
+    font-size: 12px;
+    height: 19px;
   }
 }
 

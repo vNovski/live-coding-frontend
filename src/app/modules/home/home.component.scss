@@ -39,11 +39,24 @@ p {
     text-transform: uppercase;
     color: #4e4e53e9;
     box-shadow: 0 0 10px 0 #00000091;
-
+    height: 100%;
     letter-spacing: 2px;
     font-size: 14px;
     padding: 0;
+    width: initial;
 
+    &:active {
+        color: initial;
+    }
+
+    &:hover {
+        box-shadow: 0 0 7px 0 #00000091;
+    }
+
+    &_container {
+        display: flex;
+        align-items: center;
+    }
 
     &_label {
         padding: 10px 20px;
@@ -56,5 +69,6 @@ p {
         background: #121216;
         height: 100%;
         width: 50px;
+        align-self: flex-end;
     }
 }

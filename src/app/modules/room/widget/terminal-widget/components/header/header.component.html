@@ -1,18 +1,14 @@
 <header class="terminal-widget-header">
     <div class="controls">
-        <button (click)="onExecute()" [class.active]="isRunning"
-            class="execute-btn icon-button"
-            mat-icon-button>
+        <button mat-fab (click)="onExecute()" [class.active]="isRunning"
+            class="execute-btn icon-btn">
             <mat-icon [@fadeInOut]  *ngIf="isRunning">pause</mat-icon>
             <mat-icon [@fadeInOut]  *ngIf="!isRunning">play_arrow</mat-icon>
         </button>
-        <button [matMenuTriggerFor]="menu" class="settings-btn icon-button"
-            mat-icon-button>
+        <button mat-fab [matMenuTriggerFor]="menu" class="settings-btn icon-btn">
             <mat-icon>settings</mat-icon>
         </button>
-        <button (click)="onToggleFullScreen()" class="fullscreen-btn
-            icon-button"
-            mat-icon-button>
+        <button mat-fab (click)="onToggleFullScreen()" class="fullscreen-btn icon-btn">
             <mat-icon>fullscreen</mat-icon>
         </button>
     </div>

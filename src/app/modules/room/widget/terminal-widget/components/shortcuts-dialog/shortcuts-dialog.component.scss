@@ -1,28 +1,40 @@
 @import "../../../../../../../theme/index.scss";
 
+.close-dialog-btn {
+  position: sticky!important;
+  top: 0;
+  left: 100%;
+}
+
 .shortcuts-container {
-    height: 70vh;
+  height: 70vh;
+  margin-top: -48px;
 }
 
 .mat-column-binding {
-    width: 20%;
+  width: 20%;
 }
 
 .mat-column-command {
-    width: 50%;
+  width: 50%;
 }
 
 .shortcuts {
-    width: 100%;
-    background: var(--background-color);
+  width: 100%;
+  background: var(--background-color);
 
-    th {
-        font-weight: bold;
-        font-size: 16px;
-    }
+  th {
+    font-weight: bold;
+    font-size: 16px;
+  }
 
-    th,
-    td {
-        color: var(--text-color);
-    }
+  th,
+  td {
+    border-color: transparent;
+    color: var(--text-color);
+  }
+
+  tr:not(.mat-header-row):nth-child(odd) {
+    background-color:  rgba(#424251, 0.1);
+  }
 }

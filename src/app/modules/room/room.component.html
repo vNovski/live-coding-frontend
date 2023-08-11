@@ -1,6 +1,6 @@
 <div class="container">
-  <button class="logout-btn icon-button" [class.fullscreen]="hideLeaveBtn"
-    mat-icon-button (click)="leaveRoom()">
+  <button mat-fab class="logout-btn icon-btn" [class.fullscreen]="hideLeaveBtn"
+    (click)="leaveRoom()">
     <mat-icon>exit_to_app</mat-icon>
   </button>
   <div class="container-wrapper">
@@ -19,8 +19,7 @@
       (mouseMove)="onMouseMove($event)"
       (fullscreenChange)="fullscreenChange($event)"></app-terminal-widget>
   </div>
-  <button class="support-btn icon-button" [class.hide]="hideLeaveBtn"
-    mat-icon-button (click)="contactSupport()">
+  <button mat-fab class="support-btn icon-btn" [class.hide]="hideLeaveBtn" (click)="contactSupport()">
     <mat-icon>contact_support</mat-icon>
   </button>
 

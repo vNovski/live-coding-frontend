@@ -36,11 +36,6 @@
   border-radius: 10px;
 }
 
-.icon-button {
-  color: #546e7a;
-  border-radius: 12px !important;
-}
-
 html,
 body {
   background: var(--background-color);
@@ -67,18 +62,21 @@ body {
   font-family: Roboto, "Helvetica Neue", sans-serif;
 }
 
+.mat-slide-toggle .mat-slide-toggle-bar {
+  background-color: #546e7a!important;
+}
 .mat-slide-toggle.mat-checked:not(.mat-disabled) .mat-slide-toggle-bar {
-  background-color: #3d5a67;
+  background-color: #3d5a67!important;
 }
 .mat-slide-toggle.mat-checked:not(.mat-disabled) .mat-slide-toggle-thumb {
-  background-color: #546e7a;
+  background-color: #546e7a!important;
 }
 
 .mat-slide-toggle .mat-slide-toggle-thumb {
-  background-color: var(--text-color);
+  background-color: var(--text-color)!important;
 }
 .mat-slide-toggle.mat-checked .mat-ripple-element {
-  background-color: #546e7a;
+  background-color: #546e7a!important;
 }
 
 // mat-icon-stepper selected color change
@@ -153,12 +151,14 @@ textarea {
   color: var(--text-color) !important;
 }
 
-.close-dialog-icon-btn {
-  color: var(--text-color);
+
+.mdc-icon-button {
+  cursor: pointer;
+  color: var(--text-color) !important;
   position: absolute !important;
   right: 5px;
   top: 5px;
-  z-index: 10;
+  z-index: 10!important;
 }
 
 input {
@@ -176,6 +176,7 @@ input {
 
 .open-devtools-snackbar {
   p:nth-of-type(1) {
+    color: #fff;
     font-weight: 500;
     font-size: 16px;
   }
@@ -194,4 +195,18 @@ code {
   background: var(--container-background-color);
   border: 1px solid #3d4950;
   padding: 5px;
+}
+
+.icon-btn {
+  background: var(--container-background-color)!important;
+  transition: var(--transition)!important;
+  height: 40px !important;
+  width: 40px !important;
+
+  color: #546e7a !important;
+  border-radius: 12px !important;
+
+  &__ripple {
+    border-radius: 12px !important;
+  }
 }

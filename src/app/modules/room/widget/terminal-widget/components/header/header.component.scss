@@ -6,11 +6,16 @@
   margin-top: 4px;
 
   button {
+    background: inherit;
     color: var(--text-color) !important;
     font-weight: 500;
 
     mat-icon {
       color: #546e7a !important;
+    }
+
+    &:hover {
+      background: mix(#263238, #fff, 90%);
     }
   }
 }
@@ -32,17 +37,19 @@
     width: 80%;
   }
 
-  .mat-dialog-container {
-    position: relative;
-    background-color: var(--background-color);
+  .mat-mdc-dialog-surface {
+    padding: 10px;
+    background-color: var(--background-color)!important;
   }
 }
 
+
+
 ::ng-deep .shortcuts-dialog {
   position: relative;
-  .mat-dialog-container {
+  .mat-mdc-dialog-surface {
     position: relative;
-    background-color: var(--background-color);
+    background-color: var(--background-color)!important;
     margin: 0;
     padding: 0;
   }
@@ -89,8 +96,6 @@
 
   button {
     transition: all 0.2s ease-in-out;
-    box-shadow: 0 0 5px 0 #00000091;
-    background: var(--container-background-color);
 
     &:not(:last-of-type) {
       margin-right: 10px;

@@ -274,7 +274,7 @@ export class TerminalWidgetService {
   private showModalIfDevToolsIsClosed() {
     if (!isDevtoolsOpen()) {
       this.snackBar.openFromComponent(SnackbarComponent, {
-        duration: 5000,
+        duration: 40000,
         data: `
         <div class='open-devtools-snackbar'>
           <p>

@@ -14,9 +14,7 @@
 }
 
 .support-btn {
-  background: var(--container-background-color);
   transition: var(--transition);
-  box-shadow: var(--shadow);
   position: absolute;
   bottom: 1rem;
   right: 1rem;
@@ -29,9 +27,9 @@
 }
 
 .logout-btn {
+  box-shadow: var(--shadow);
   transform: scale(-1);
   transition: var(--transition);
-  box-shadow: inset var(--shadow);
   position: absolute;
   top: 1rem;
   left: 1rem;
@@ -60,10 +58,11 @@
     width: 30%;
   }
 
-  .mat-dialog-container {
+  .mat-mdc-dialog-surface  {
     position: relative;
-    background-color: var(--background-color);
+    background-color: var(--background-color)!important;
     margin: 0;
+    padding-top: 10px;
     padding-left: 0;
     padding-right: 0;
     padding-bottom: 0;
