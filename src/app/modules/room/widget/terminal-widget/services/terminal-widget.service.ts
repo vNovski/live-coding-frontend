@@ -1,3 +1,4 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import {
   asyncScheduler,
@@ -30,10 +31,19 @@ import { ModuleKind, transpileModule } from 'typescript';
 export class TerminalWidgetService {
   private isWorkerAlive$ = new BehaviorSubject(false);
   private worker: Worker | null = null;
-
+  private evalModuleCode = '';
   public readonly isRunning$ = this.isWorkerAlive$.asObservable();
 
-  constructor(private readonly snackBar: SnackbarService) {}
+  constructor(
+    private readonly snackBar: SnackbarService,
+    private httpClient: HttpClient
+  ) {
+    this.getWorkerWrapper().subscribe((code) => (this.evalModuleCode = code));
+  }
+
+  getWorkerWrapper(): Observable<string> {
+    return this.httpClient.get('assets/eval/eval.js', { responseType: 'text' });
+  }
 
   download(code: string): void {
     if (!code) {
@@ -87,7 +97,7 @@ export class TerminalWidgetService {
           type === EExecutionEvents.syncComplete ||
           type === EExecutionEvents.asyncComplete
       ),
-      take(2), // complete stream after receiving status about sync and async operations 
+      take(2), // complete stream after receiving status about sync and async operations
       skip(1), // skip first value because we use syncAndAsyncCompleteEvent$ in TakeUntil so we wanna trigger emit only onse when everything is completed
       tap(() => this.terminateWorker())
     );
@@ -118,159 +128,6 @@ export class TerminalWidgetService {
     this.worker = null;
   }
 
-  private getWorkerCode(codeToInject: string): string {
-    return `
-        class AsyncOperationsManager {
-          counter = 0;
-          postMessage;
-
-          constuctor(postMessage) {
-            this.postMessage = postMessage
-          }
-        
-          inc() {
-            this.counter+=1;
-            this.shareUpdate();
-          }
-        
-          dec() {
-            this.counter-=1;
-            this.shareUpdate();
-          }
-
-          shareUpdate() {
-            if(this.counter === 0) {
-              self.postMessage(JSON.stringify({ type: ${EExecutionEvents.asyncComplete}, data: null }));
-            }
-          }
-        }
-        
-        const timersSet = new Set();
-        
-        onmessage = (message) => {
-            const nativePostMessage = this.postMessage;
-            const asyncOperationManager = new AsyncOperationsManager(nativePostMessage);
-            // const bufferTime = 100 // ms;
-            // let startTime = performance.now();
-            let actions = [];
-            const unit = message.data;
-            
-
-            ['log', 'info', 'warn', 'error'].forEach(patchConsoleMethod);
-            // const sandboxProxy = new Proxy(Object.assign(unitApi, apis), {has, get});
-            
-            // Object.keys(this).forEach(key => {
-            //     delete this[key];
-            // });
-            
-            this.Function = function() { return 'Not bad =)' };
-
-            // Monkey patched async methods
-
-            // Promise
-            class LiveCodingPromise extends Promise {
-              constructor(executor, test) {
-                asyncOperationManager.inc();
-                super(executor);
-                super.finally(() => asyncOperationManager.dec());
-              }
-            }
-            LiveCodingPromise.prototype.constructor = Promise;
-            Promise = LiveCodingPromise;
-
-            // SetTimeout
-            const nativeSetTimeout = setTimeout;
-            const liveCodingSetTimeout = (cb, ...args) => {
-              const timeout = nativeSetTimeout(() => {
-                  cb();
-                  asyncOperationManager.dec();
-                  timersSet.delete(timeout);
-              }, ...args);
-              asyncOperationManager.inc();
-              timersSet.add(timeout);
-            }
-            setTimeout = liveCodingSetTimeout;
-
-            // SetInterval
-            const nativeSetInterval = setInterval;
-            const liveCodingSetInterval = (...args) => {
-              const interval = nativeSetInterval(...args);
-              asyncOperationManager.inc();
-              timersSet.add(interval);
-              return interval;
-            }
-            setInterval = liveCodingSetInterval;
-
-            // clearInterval
-            const nativeClearInterval = clearInterval;
-            const liveCodingClearInterval = (id) => {
-              asyncOperationManager.dec();
-              timersSet.delete(id);
-              return nativeClearInterval(id)
-            }
-            clearInterval = liveCodingClearInterval;
-
-            // clearTimeout
-            const nativeclearTimeout = clearTimeout;
-            const liveCodingClearTimeout = (id) => {
-              asyncOperationManager.dec();
-              timersSet.delete(id);
-              return nativeclearTimeout(id)
-            }
-            clearTimeout = liveCodingClearTimeout;
-
-
-            //with (sandboxProxy) {
-                (function() {
-                        ${codeToInject};
-                }).call('Nice try but try smth else ;)')
-            //}
-            
-            function has (target, key) {
-                return true;
-            }
-            
-            function get (target, key) {
-                if (key === Symbol.unscopables) return undefined;
-                return target[key];
-            }
-
-            
-        
-            function patchConsoleMethod(name) {
-                const nativeMethod = console[name].bind(console);
-                
-                console[name] = (...attributes) => {
-                    attributes = attributes.map(attr => {
-                        if (attr instanceof Error) {
-                            return attr.constructor.name + ': ' + attr.message;
-                        }
-                        
-                        if (attr instanceof Object) {
-                            return JSON.stringify(attr);
-                        }
-                        
-                        return attr;
-                    })
-                    actions.push({type: name, data: [...attributes]});
-                   
-                    // let endTime = performance.now();
-                    // if(endTime - startTime >= bufferTime) {
-                      // startTime = performance.now();
-                      nativePostMessage(JSON.stringify({ type: ${EExecutionEvents.client}, data: actions}));
-                      actions = [];
-                    // }
-
-                    // nativeMethod(...attributes);
-                }
-            }
-            nativePostMessage(JSON.stringify({ type: ${EExecutionEvents.syncComplete}, data: null }));
-            if(asyncOperationManager.counter === 0) {
-              asyncOperationManager.shareUpdate();
-            }
-        }`;
-  }
-
   private showModalIfDevToolsIsClosed() {
     if (!isDevtoolsOpen()) {
       this.snackBar.openFromComponent(SnackbarComponent, {
@@ -290,7 +147,8 @@ export class TerminalWidgetService {
   }
 
   private getCodeBlob(jsCode: string): any {
-    const blob = new Blob([this.getWorkerCode(jsCode)], {
+    const code = this.evalModuleCode.replace('//{INJECT}//', jsCode);
+    const blob = new Blob([code], {
       type: 'text/javascript',
     });
     return URL.createObjectURL(blob);

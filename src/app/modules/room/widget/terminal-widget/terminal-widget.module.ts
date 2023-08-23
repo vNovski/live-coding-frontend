@@ -10,6 +10,7 @@ import { ShortcutsDialogComponent } from './components/shortcuts-dialog/shortcut
 import { OnlineIndicatorComponent } from './components/online-indicator/online-indicator.component';
 import { TestComponent } from './components/test/test.component';
 import { AboutUsDialogComponent } from './components/about-us-dialog/about-us-dialog.component';
+import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
   declarations: [
@@ -27,6 +28,7 @@ import { AboutUsDialogComponent } from './components/about-us-dialog/about-us-di
     ReactiveFormsModule,
     MaterialModule,
     SharedModule,
+    HttpClientModule
   ],
   exports: [
     CommonModule,
