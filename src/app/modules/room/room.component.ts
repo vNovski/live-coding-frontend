@@ -1,17 +1,13 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
-import { filter, map, Subject, takeUntil } from 'rxjs';
-import {
-  ConnectionsService,
-  RoomEvents,
-} from 'src/app/core/services/connections/connections.service';
+import { filter, map, Observable, startWith, Subject, takeUntil } from 'rxjs';
 import { SnackbarService } from 'src/app/core/services/snackbar.service';
 import {
   CommunicationEventTypes,
   SocketService,
-} from 'src/app/core/services/socket/socket.service';
-import { UserService } from 'src/app/core/services/user/user.service';
+} from 'src/app/modules/room/services/socket/socket.service';
+import { UserService } from 'src/app/modules/room/services/user/user.service';
 import { RoomService } from './room.service';
 import { TerminalChange } from './widget/terminal-widget/interfaces/terminal-change.interface';
 import { ContactSupportDialogComponent } from './components/contact-support-dialog/contact-support-dialog.component';
@@ -50,20 +46,20 @@ export class RoomComponent implements OnInit, OnDestroy {
   roomId: string | null = null;
   hideLeaveBtn = false;
 
-  userIds$ = this.roomService.connections$.pipe(
+  userIds$: Observable<string[]> = this.roomService.connections$.pipe(
     map((users) => users.map(({ id }) => id))
   );
 
   private ngUnsubscribe: Subject<void> = new Subject<void>();
 
   constructor(
-    public readonly connectionService: ConnectionsService,
     public socketService: SocketService,
     private route: ActivatedRoute,
     private readonly router: Router,
     readonly roomService: RoomService,
-    private readonly dialog: MatDialog
-  ) {}
+    private readonly dialog: MatDialog,
+  ) {
+  }
 
   ngOnInit(): void {
     this.route.params.subscribe((params) => {
@@ -98,7 +94,7 @@ export class RoomComponent implements OnInit, OnDestroy {
   }
 
   leaveRoom(): void {
-    this.socketService.emit(RoomEvents.leave, this.roomId);
+    this.roomService.leaveRoom();
     this.router.navigate(['/']);
   }
 

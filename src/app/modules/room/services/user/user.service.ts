@@ -1,15 +1,18 @@
 import { Injectable } from '@angular/core';
-import { UserInfo } from 'os';
 import { environment } from 'src/environments/environment';
-import { HEX } from '../../types/color.type';
-import { generateUsername } from '../../utils/username-generator';
-import { LocalStorageService } from '../localStorage/local-storage.service';
+import { HEX } from '../../../../core/types/color.type';
+import { generateUsername } from '../../../../core/utils/username-generator';
+import { LocalStorageService } from '../../../../core/services/localStorage/local-storage.service';
 
-export interface IUserInfo {
-  id: string;
+export interface IBasicUserInfo {
   color: HEX;
   username: string;
 }
+
+export interface IUserInfo extends IBasicUserInfo {
+  id: string; 
+}
+
 
 @Injectable({
   providedIn: 'root',
@@ -24,11 +27,7 @@ export class UserService {
     this.initUserName();
   }
 
-  setId(id: string) {
-    this.id = id;
-  }
-
-  initColor(): void {
+  private initColor(): void {
     const color = this.localStorage.get('user-color') as HEX;
     if (color) {
       this.color = color;
@@ -41,7 +40,7 @@ export class UserService {
     }
   }
 
-  initUserName(): void {
+  private initUserName(): void {
     const username = this.localStorage.get('user-name');
     if (username) {
       this.username = username;
@@ -52,12 +51,8 @@ export class UserService {
     }
   }
 
-  getInfo(): IUserInfo | null {
-    if (!this.id) {
-      return null;
-    }
+  getInfo(): IBasicUserInfo {
     return {
-      id: this.id,
       username: this.username,
       color: this.color,
     };

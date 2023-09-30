@@ -1,8 +1,8 @@
 import { Inject, Injectable } from '@angular/core';
 import { BehaviorSubject, filter, map, Observable, take, tap, withLatestFrom } from 'rxjs';
 import { SnackbarService } from 'src/app/core/services/snackbar.service';
-import { SocketService } from 'src/app/core/services/socket/socket.service';
-import { IUserInfo as IUser, UserService } from 'src/app/core/services/user/user.service';
+import { SocketService } from 'src/app/modules/room/services/socket/socket.service';
+import { IUserInfo as IUser, UserService } from 'src/app/modules/room/services/user/user.service';
 
 import { RoomEvents } from './enums/room-events.enum';
 import { TermianlEvents } from './widget/enums/terminal-events.enum';
@@ -47,10 +47,11 @@ export class RoomService {
 
   public otherMouseMove$ = this.socketService.on(TermianlEvents.mouseMove).pipe(
     withLatestFrom(this.connections$),
-    map(([mouse, users]) => ({
+    map(([mouse, users]) => {
+      return {
       ...users.find((user) => user.id === mouse.userId),
       ...mouse.position,
-    }))
+    }})
   );
 
   public initialState$ = this.socketService.on(TermianlEvents.shareState);
@@ -61,12 +62,15 @@ export class RoomService {
   }
 
   constructor(
-    @Inject('id') id: string,
+    @Inject('id') id: string, // room id
     private readonly userService: UserService,
     private readonly socketService: SocketService,
     private readonly snackBar: SnackbarService
   ) {
     this.id = id;
+    const basicUserInfo = this.userService.getInfo();
+    this.socketService.connect(basicUserInfo).subscribe((id) => this.userService.id = id);
+
     this.init();
     this.listenForConnect();
     this.listenForDisconnect();
@@ -76,15 +80,6 @@ export class RoomService {
     this.initialConnections$.subscribe((users: IUser[]) => {
       this._connections$.next(users);
     });
-
-    this.socketService.id$
-      .pipe(
-        filter((id) => !!id),
-        take(1)
-      )
-      .subscribe((userId: string) => {
-        this.userService.setId(userId);
-      });
   }
 
   private listenForConnect(): void {
