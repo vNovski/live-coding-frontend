@@ -118,7 +118,7 @@ export class RoomService {
   }
 
   leaveRoom(): void {
-    this.socketService.emit(RoomEvents.leave, this.id);
+    this.socketService.disconnect();
   }
 
   joinRoom(): void {
