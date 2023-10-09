@@ -1,0 +1,52 @@
+.container {
+  margin: 40px;
+  max-width: 600px;
+  box-shadow: 0px 0px 20px 4px #000;
+}
+
+.controls {
+  margin-top: 10px;
+}
+
+.refresh {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+
+  mat-icon {
+    animation: none;
+  }
+  mat-icon.loading {
+    animation: rotate 1.5s infinite linear;
+    @keyframes rotate {
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+  }
+}
+
+::ng-deep .mat-expansion-panel-header {
+    ::ng-deep  .mat-content {
+        overflow: initial!important;
+    }
+}
+
+.mat-card-header {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+input {
+  color: var(--background-color) !important;
+}
+
+.mat-expansion-panel-header-description {
+  justify-content: end;
+  align-items: center;
+}
+
+.mat-mdc-form-field + .mat-mdc-form-field {
+  margin-left: 8px;
+}

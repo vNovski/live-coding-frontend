@@ -10,6 +10,10 @@ const routes: Routes = [
     path: 'room/:id',
     loadChildren: (): any => import('./modules/room/room.module').then((m) => m.RoomModule),
   },
+  {
+    path: 'admin-panel',
+    loadChildren: (): any => import('./modules/admin-panel/admin-panel.module').then((m) => m.AdminPanelModule),
+  },
 ];
 
 @NgModule({

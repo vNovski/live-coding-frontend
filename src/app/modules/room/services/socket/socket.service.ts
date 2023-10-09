@@ -53,7 +53,6 @@ export class SocketService {
 
   private monitorConnectionStatus() {
     this.socket.on('connect', () => {
-      console.log('ID', this.socket.id);
       this._available$.next(true);
     });
 

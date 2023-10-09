@@ -6,11 +6,13 @@ import { ConnectionSnackbarComponent } from './components/connection-snackbar/co
 import { EmptyComponent } from './components/empty/empty.component';
 import { ParticlesBackgroundModule } from './modules/particles-background/particles-background.module';
 import { TerminalModule } from './modules/terminal/terminal.module';
+import { FilterPipe } from './pipes/filter.pipe';
 
 @NgModule({
     declarations: [
         ConnectionSnackbarComponent,
         EmptyComponent,
+        FilterPipe,
     ],
     imports: [
         CommonModule,
@@ -24,6 +26,7 @@ import { TerminalModule } from './modules/terminal/terminal.module';
         TerminalModule,
         ParticlesBackgroundModule,
         EmptyComponent,
+        FilterPipe,
     ]
 })
 export class SharedModule {}

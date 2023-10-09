@@ -99,8 +99,9 @@ export class RoomService {
   private listenForDisconnect(): void {
     this.disconnect$
       .pipe(
-        tap(() => {
-          this.snackBar.open('User disconnected', '', { panelClass: ['info'] });
+        tap((id) => {
+          const username = this._connections$.value.find((client: any) => client.id === id)?.username;
+          this.snackBar.open(`${username} disconnected`, '', { panelClass: ['info'] });
         })
       )
       .subscribe((userId: string) => {
