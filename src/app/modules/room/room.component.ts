@@ -67,7 +67,7 @@ export class RoomComponent implements OnInit, OnDestroy {
       this.roomId = id;
     });
     this.roomService.available$
-      .pipe(filter((status) => status))
+      .pipe(filter((status) => status), takeUntil(this.ngUnsubscribe))
       .subscribe(() => {
         this.roomService.joinRoom();
       });
