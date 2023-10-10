@@ -51,7 +51,7 @@ declare var CodeMirror: any;
       useExisting: forwardRef(() => TerminalComponent),
       multi: true,
     },
-    TerminalService
+    TerminalService,
   ],
   styleUrls: ['./terminal.component.scss'],
   preserveWhitespaces: false,
@@ -109,6 +109,7 @@ export class TerminalComponent
   isFocused = false;
   codeMirror?: EditorFromTextArea;
   ingoreNextChange = false;
+  private isForcedUpdate = false;
   /**
    * either global variable or required library
    */
@@ -158,21 +159,25 @@ export class TerminalComponent
           this.codemirrorValueChanged(cm, change);
         })
       );
-     
+
       let dragTargetCounter = 0;
       let isCodeDragged = false;
-      document.querySelector('.CodeMirror-scroll')?.addEventListener('dragstart', (e) => {
-        e.stopPropagation();
-        isCodeDragged=true;
-      });
+      document
+        .querySelector('.CodeMirror-scroll')
+        ?.addEventListener('dragstart', (e) => {
+          e.stopPropagation();
+          isCodeDragged = true;
+        });
 
-      document.querySelector('.CodeMirror-scroll')?.addEventListener('dragend', (e) => {
-        e.stopPropagation();
-        isCodeDragged = false;
-      });
+      document
+        .querySelector('.CodeMirror-scroll')
+        ?.addEventListener('dragend', (e) => {
+          e.stopPropagation();
+          isCodeDragged = false;
+        });
 
       this.codeMirror.on('dragenter', (_, e) => {
-        if(isCodeDragged) return;
+        if (isCodeDragged) return;
         dragTargetCounter++;
         this._ngZone.run(() => {
           this.fileover = true;
@@ -180,12 +185,11 @@ export class TerminalComponent
         });
       });
 
-
       this.codeMirror.on('dragleave', (_, e) => {
-        if(isCodeDragged) return;
+        if (isCodeDragged) return;
         this._ngZone.run(() => {
           dragTargetCounter--;
-          if(dragTargetCounter === 0) {
+          if (dragTargetCounter === 0) {
             this.fileover = false;
             this.cdRef.markForCheck();
           }
@@ -230,12 +234,14 @@ export class TerminalComponent
   }
   codemirrorValueChanged(cm: Editor, change: EditorChange) {
     const cmVal = cm.getValue();
-
     this.value = cmVal;
     this.onchange.emit({
       ...change,
-      ignore: change.origin === '+ignore' || change.origin === 'setValue',
+      ignore:
+        (change.origin === '+ignore' || change.origin === 'setValue') &&
+        !this.isForcedUpdate,
     });
+    this.isForcedUpdate = false;
     this.onChange(this.value);
   }
   setOptionIfChanged(optionName: string, newValue: any) {
@@ -338,7 +344,10 @@ export class TerminalComponent
     return codeMirror.fromTextArea(this.ref.nativeElement, {
       ...this._options,
       extraKeys: {
-        [ETerminalShortcuts.format]: this.beautify,
+        [ETerminalShortcuts.format]: (cm: Editor) => {
+          this.isForcedUpdate = true;
+          this.beautify(cm);
+        },
         [ETerminalShortcuts.comment]: this.comment,
       },
     }) as EditorFromTextArea;
