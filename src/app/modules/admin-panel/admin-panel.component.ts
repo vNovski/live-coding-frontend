@@ -47,8 +47,13 @@ export class AdminPanelComponent {
   refresh() {
     let rooms: { [roomId: string]: any } = {};
     this.isLoading = true;
+    const headers = { 'Content-Type': 'application/json' };
     this.httpClient
-      .get<any[]>(environment.serverUri + '/api/rooms')
+      .post<any[]>(
+        environment.serverUri + '/api/rooms',
+        { password: this.password },
+        { headers }
+      )
       .pipe(throttleTime(1000))
       .subscribe((clients: any[]) => {
         this.isLoading = false;
