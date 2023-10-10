@@ -39,7 +39,7 @@
               class="example-box"
               *ngFor="let client of room.clients">
               {{ client.username }}
-              <mat-icon matChipRemove>cancel</mat-icon>
+              <mat-icon matChipRemove (click)="kickFromRoom($event, room.id, client.id)">cancel</mat-icon>
             </mat-chip>
           </mat-chip-set>
           <div class="controls">

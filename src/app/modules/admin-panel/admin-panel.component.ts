@@ -22,18 +22,20 @@ export class AdminPanelComponent {
   roomsSearch = this.rooms;
   isLoggedIn = false;
   password = 'qweasdzxc';
+
+  private headers = { 'Content-Type': 'application/json' };
+
   constructor(
     private httpClient: HttpClient,
     private cdRef: ChangeDetectorRef
   ) {}
 
   login() {
-    const headers = { 'Content-Type': 'application/json' };
     this.httpClient
       .post<boolean>(
         environment.serverUri + '/api/login',
         { password: this.password },
-        { headers }
+        { headers: this.headers }
       )
       .subscribe((status) => {
         this.isLoggedIn = status;
@@ -47,12 +49,11 @@ export class AdminPanelComponent {
   refresh() {
     let rooms: { [roomId: string]: any } = {};
     this.isLoading = true;
-    const headers = { 'Content-Type': 'application/json' };
     this.httpClient
       .post<any[]>(
         environment.serverUri + '/api/rooms',
         { password: this.password },
-        { headers }
+        { headers: this.headers }
       )
       .pipe(throttleTime(1000))
       .subscribe((clients: any[]) => {
@@ -68,6 +69,35 @@ export class AdminPanelComponent {
           id,
           clients,
         }));
+        this.cdRef.markForCheck();
+      });
+  }
+
+  kickFromRoom(event: MouseEvent, roomId: string, socketId: string): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.httpClient
+      .post<{ socketId: string }>(
+        environment.serverUri + '/api/kick',
+        { password: this.password, socketId: socketId },
+        { headers: this.headers }
+      )
+      .subscribe((data) => {
+        if (!data) return;
+        console.log(data);
+        this.rooms = this.rooms.reduce((rooms, room) => {
+          if (room.id !== roomId) return [...rooms, room];
+          const updatedRoom = {
+            ...room,
+            clients: room.clients.filter(
+              (client: any) => client.id !== data.socketId
+            ),
+          };
+          if(!updatedRoom.clients.length) {
+            return rooms;
+          }
+          return [...rooms, updatedRoom];
+        }, []);
         this.cdRef.markForCheck();
       });
   }
