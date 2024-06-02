@@ -46,11 +46,7 @@ export class SocketService {
     this.monitorConnectionStatus();
     return this.id$;
   }
-
-  disconnect() {
-    this.socket.disconnect();
-  }
-
+  
   disconnect() {
     this.socket.disconnect();
   }
