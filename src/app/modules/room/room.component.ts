@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
-import { filter, map, Subject, takeUntil } from 'rxjs';
+import { filter, map, Observable, startWith, Subject, takeUntil } from 'rxjs';
 import { SnackbarService } from 'src/app/core/services/snackbar.service';
 import {
   CommunicationEventTypes,
@@ -46,7 +46,7 @@ export class RoomComponent implements OnInit, OnDestroy {
   roomId: string | null = null;
   hideLeaveBtn = false;
 
-  userIds$ = this.roomService.connections$.pipe(
+  userIds$: Observable<string[]> = this.roomService.connections$.pipe(
     map((users) => users.map(({ id }) => id))
   );
 
@@ -57,8 +57,9 @@ export class RoomComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private readonly router: Router,
     readonly roomService: RoomService,
-    private readonly dialog: MatDialog
-  ) {}
+    private readonly dialog: MatDialog,
+  ) {
+  }
 
   ngOnInit(): void {
     this.route.params.subscribe((params) => {
@@ -66,7 +67,7 @@ export class RoomComponent implements OnInit, OnDestroy {
       this.roomId = id;
     });
     this.roomService.available$
-      .pipe(filter((status) => status))
+      .pipe(filter((status) => status), takeUntil(this.ngUnsubscribe))
       .subscribe(() => {
         this.roomService.joinRoom();
       });

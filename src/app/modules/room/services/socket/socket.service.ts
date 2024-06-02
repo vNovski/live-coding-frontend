@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, filter, map, Observable } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
 import { environment } from 'src/environments/environment';
-import { IUserInfo } from '../user/user.service';
+import { IBasicUserInfo, IUserInfo } from '../user/user.service';
 
 export enum CommunicationEventTypes {
   terminalChange = 'terminal-code-change',
@@ -38,13 +38,17 @@ export class SocketService {
   }
 
   constructor() {}
-
-  connect(userQuery: IUserInfo) {
+  connect(userQuery: IBasicUserInfo): Observable<string> {
     this.socket = io(environment.serverUri, {
       transports: ['websocket'],
       query: userQuery ,
     });
     this.monitorConnectionStatus();
+    return this.id$;
+  }
+
+  disconnect() {
+    this.socket.disconnect();
   }
 
   disconnect() {

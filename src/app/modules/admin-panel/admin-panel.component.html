@@ -1,0 +1,55 @@
+<div class="container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>
+        Active Rooms
+      </mat-card-title>
+      <mat-card-subtitle>(rooms & clients)</mat-card-subtitle>
+      <button [disabled]="isLoading" class="refresh" mat-mini-fab
+        aria-label="refresh" color="default" (click)="refresh()">
+        <mat-icon [class.loading]="isLoading">refresh</mat-icon>
+      </button>
+    </mat-card-header>
+    <ng-container *ngIf="!isLoggedIn">
+      <mat-form-field>
+        <mat-label>Password</mat-label>
+        <input matInput [(ngModel)]="password">
+      </mat-form-field>
+      <button mat-raised-button color="primary" (click)="login()">Log In</button>
+    </ng-container>
+    <ng-container *ngIf="isLoggedIn">
+      <mat-form-field class="example-full-width">
+        <input type="text" [(ngModel)]="search" matInput
+          placeholder="Search">
+      </mat-form-field>
+      <mat-accordion>
+        <mat-expansion-panel
+          *ngFor="let room of rooms | filter : search : 'id'">
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              Room ID: {{room.id}}
+            </mat-panel-title>
+            <mat-panel-description>
+              <mat-icon matBadgeSize="small" [matBadge]="room.clients.length"
+                matBadgeColor="warn">room_preferences</mat-icon>
+            </mat-panel-description>
+          </mat-expansion-panel-header>
+          <mat-chip-set>
+            <mat-chip
+              class="example-box"
+              *ngFor="let client of room.clients">
+              {{ client.username }}
+              <mat-icon matChipRemove (click)="kickFromRoom($event, room.id, client.id)">cancel</mat-icon>
+            </mat-chip>
+          </mat-chip-set>
+          <div class="controls">
+            <button mat-raised-button color="warn">Destroy room</button>
+            <a mat-raised-button color="primary"
+              [routerLink]="['/room/' + room.id]" target="_blank">Join Room</a>
+          </div>
+        </mat-expansion-panel>
+      </mat-accordion>
+    </ng-container>
+
+  </mat-card>
+</div>

@@ -25,6 +25,6 @@ import { TerminalWidgetModule } from './widget/terminal-widget/terminal-widget.m
     MatInputModule,
     SharedModule,
     MatSelectModule
-  ]
+  ],
 })
 export class RoomModule { }

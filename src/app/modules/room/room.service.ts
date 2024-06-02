@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@angular/core';
+import { Inject, Injectable, OnDestroy } from '@angular/core';
 import { BehaviorSubject, filter, map, Observable, take, tap, withLatestFrom } from 'rxjs';
 import { SnackbarService } from 'src/app/core/services/snackbar.service';
 import { SocketService } from 'src/app/modules/room/services/socket/socket.service';
@@ -47,10 +47,11 @@ export class RoomService {
 
   public otherMouseMove$ = this.socketService.on(TermianlEvents.mouseMove).pipe(
     withLatestFrom(this.connections$),
-    map(([mouse, users]) => ({
+    map(([mouse, users]) => {
+      return {
       ...users.find((user) => user.id === mouse.userId),
       ...mouse.position,
-    }))
+    }})
   );
 
   public initialState$ = this.socketService.on(TermianlEvents.shareState);
@@ -61,12 +62,15 @@ export class RoomService {
   }
 
   constructor(
-    @Inject('id') id: string,
+    @Inject('id') id: string, // room id
     private readonly userService: UserService,
     private readonly socketService: SocketService,
     private readonly snackBar: SnackbarService
   ) {
     this.id = id;
+    const basicUserInfo = this.userService.getInfo();
+    this.socketService.connect(basicUserInfo).subscribe((id) => this.userService.id = id);
+
     this.init();
     this.listenForConnect();
     this.listenForDisconnect();
@@ -95,8 +99,9 @@ export class RoomService {
   private listenForDisconnect(): void {
     this.disconnect$
       .pipe(
-        tap(() => {
-          this.snackBar.open('User disconnected', '', { panelClass: ['info'] });
+        tap((id) => {
+          const username = this._connections$.value.find((client: any) => client.id === id)?.username;
+          this.snackBar.open(`${username} disconnected`, '', { panelClass: ['info'] });
         })
       )
       .subscribe((userId: string) => {
@@ -114,7 +119,7 @@ export class RoomService {
   }
 
   leaveRoom(): void {
-    this.socketService.emit(RoomEvents.leave, this.id);
+    this.socketService.disconnect();
   }
 
   joinRoom(): void {

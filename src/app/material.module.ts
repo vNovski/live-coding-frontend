@@ -7,6 +7,14 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatLegacySlideToggleModule as MatSlideToggleModule } from '@angular/material/legacy-slide-toggle';
 import {MatLegacyMenuModule as MatMenuModule} from '@angular/material/legacy-menu';
 import {MatLegacyTableModule as MatTableModule} from '@angular/material/legacy-table';
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatExpansionModule } from '@angular/material/expansion';
+import {MatChipsModule} from '@angular/material/chips';
+import {MatCardModule} from '@angular/material/card';
+import {MatBadgeModule} from '@angular/material/badge';
+
 @NgModule({
   declarations: [],
   imports: [
@@ -17,7 +25,16 @@ import {MatLegacyTableModule as MatTableModule} from '@angular/material/legacy-t
     MatDialogModule,
     MatSlideToggleModule,
     MatMenuModule,
-    MatTableModule
+    MatTableModule,
+    MatButtonModule,
+    MatExpansionModule,
+    MatIconModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatNativeDateModule,
+    MatChipsModule,
+    MatCardModule,
+    MatBadgeModule
   ],
   exports: [
     MatSnackBarModule,
@@ -26,7 +43,16 @@ import {MatLegacyTableModule as MatTableModule} from '@angular/material/legacy-t
     MatDialogModule,
     MatSlideToggleModule,
     MatMenuModule,
-    MatTableModule
+    MatTableModule,
+    MatButtonModule,
+    MatExpansionModule,
+    MatIconModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatNativeDateModule,
+    MatChipsModule,
+    MatCardModule,
+    MatBadgeModule
   ]
 })
 export class MaterialModule { }
