@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { map } from 'rxjs';
-import { UserService } from 'src/app/core/services/user/user.service';
+import { UserService } from 'src/app/modules/room/services/user/user.service';
 import { RoomService } from 'src/app/modules/room/room.service';
 
 @Component({

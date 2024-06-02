@@ -1,21 +1,23 @@
-import { Injectable } from "@angular/core";
+import { Injectable, Inject } from "@angular/core";
+import { DOCUMENT } from '@angular/common';
 
 @Injectable({
   providedIn: 'root'
 })
 export class LocalStorageService {
+  private domain = this.document.location.hostname;
 
-  constructor() { }
+  constructor(@Inject(DOCUMENT) private document: Document) { }
 
   public set(key: string, value: string) {
-    localStorage.setItem(key, value);
+    localStorage.setItem(`${this.domain}-${key}`, value);
   }
 
   public get(key: string) {
-    return localStorage.getItem(key)
+    return localStorage.getItem(`${this.domain}-${key}`)
   }
   public remove(key: string) {
-    localStorage.removeItem(key);
+    localStorage.removeItem(`${this.domain}-${key}`);
   }
 
   public clear() {

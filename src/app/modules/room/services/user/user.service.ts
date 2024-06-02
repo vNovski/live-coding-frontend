@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
 import { UserInfo } from 'os';
 import { environment } from 'src/environments/environment';
-import { HEX } from '../../types/color.type';
-import { generateUsername } from '../../utils/username-generator';
-import { LocalStorageService } from '../localStorage/local-storage.service';
+import { HEX } from '../../../../core/types/color.type';
+import { generateUsername } from '../../../../core/utils/username-generator';
+import { LocalStorageService } from '../../../../core/services/localStorage/local-storage.service';
 
 export interface IUserInfo {
-  id: string;
+  id?: string; 
   color: HEX;
   username: string;
 }
@@ -22,10 +22,6 @@ export class UserService {
   constructor(private readonly localStorage: LocalStorageService) {
     this.initColor();
     this.initUserName();
-  }
-
-  setId(id: string) {
-    this.id = id;
   }
 
   initColor(): void {
@@ -52,12 +48,9 @@ export class UserService {
     }
   }
 
-  getInfo(): IUserInfo | null {
-    if (!this.id) {
-      return null;
-    }
+  getInfo(): IUserInfo {
+
     return {
-      id: this.id,
       username: this.username,
       color: this.color,
     };

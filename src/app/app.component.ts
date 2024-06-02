@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
 import { routerTransition } from './routing-animations';
+import { SocketService } from './modules/room/services/socket/socket.service';
+import { UserService } from './modules/room/services/user/user.service';
 
 @Component({
   selector: 'app-root',
@@ -10,7 +12,10 @@ import { routerTransition } from './routing-animations';
 export class AppComponent {
   year = new Date().getFullYear();
 
-  constructor() {}
+  constructor(private socketService: SocketService, private userService: UserService) {
+    const userInfo = this.userService.getInfo();
+    this.socketService.connect(userInfo);
+  }
 
   getState(outlet: any) {
     return outlet && 

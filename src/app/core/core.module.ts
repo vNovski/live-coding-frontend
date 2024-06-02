@@ -1,9 +1,6 @@
 import { NgModule, Optional, SkipSelf } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { SocketService } from './services/socket/socket.service';
-import { ConnectionsService } from './services/connections/connections.service';
 import { LocalStorageService } from './services/localStorage/local-storage.service';
-import { UserService } from './services/user/user.service';
 
 const throwIfAlreadyLoaded = (parentModule: any, moduleName: string): void => {
   if (parentModule) {
@@ -15,7 +12,7 @@ const throwIfAlreadyLoaded = (parentModule: any, moduleName: string): void => {
 
 @NgModule({
   declarations: [],
-  providers: [SocketService, ConnectionsService, LocalStorageService, UserService],
+  providers: [LocalStorageService],
   imports: [
     CommonModule
   ]
