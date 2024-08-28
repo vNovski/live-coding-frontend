@@ -49,9 +49,10 @@ export class RoomService {
     withLatestFrom(this.connections$),
     map(([mouse, users]) => {
       return {
-      ...users.find((user) => user.id === mouse.userId),
-      ...mouse.position,
-    }})
+        ...users.find((user) => user.id === mouse.userId),
+        ...mouse.position,
+      }
+    })
   );
 
   public initialState$ = this.socketService.on(TermianlEvents.shareState);
@@ -123,13 +124,7 @@ export class RoomService {
   }
 
   joinRoom(): void {
-    const userInfo = this.userService.getInfo();
-    if (userInfo) {
-      this.socketService.emit(RoomEvents.join, {
-        roomId: this.id,
-        user: userInfo,
-      });
-    }
+    this.socketService.emit(RoomEvents.join, { roomId: this.id });
   }
 
   mouseMove(position: IMousePosition): void {

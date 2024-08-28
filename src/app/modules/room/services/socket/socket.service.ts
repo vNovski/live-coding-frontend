@@ -62,7 +62,7 @@ export class SocketService {
     });
   }
 
-  emit(event: string, data: any) {
+  emit(event: string, data?: any) {
     this.socket.emit(event, data);
   }
   on(event: any): Observable<any> {
