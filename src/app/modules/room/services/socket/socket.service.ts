@@ -33,7 +33,7 @@ export class SocketService {
   get id$(): Observable<string> {
     return this._available$.asObservable().pipe(
       filter((status) => status),
-      map(() => this.socket.id)
+      map(() => this.socket.id as string)
     );
   }
 
@@ -41,12 +41,12 @@ export class SocketService {
   connect(userQuery: IBasicUserInfo): Observable<string> {
     this.socket = io(environment.serverUri, {
       transports: ['websocket'],
-      query: userQuery ,
+      query: userQuery,
     });
     this.monitorConnectionStatus();
     return this.id$;
   }
-  
+
   disconnect() {
     this.socket.disconnect();
   }
