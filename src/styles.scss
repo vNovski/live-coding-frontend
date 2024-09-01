@@ -63,20 +63,24 @@ body {
   font-family: Roboto, "Helvetica Neue", sans-serif;
 }
 
-.mat-slide-toggle .mat-slide-toggle-bar {
+/* TODO(mdc-migration): The following rule targets internal classes of slide-toggle that may no longer apply for the MDC version. */
+.mat-mdc-slide-toggle .mat-slide-toggle-bar {
   background-color: #546e7a!important;
 }
-.mat-slide-toggle.mat-checked:not(.mat-disabled) .mat-slide-toggle-bar {
+/* TODO(mdc-migration): The following rule targets internal classes of slide-toggle that may no longer apply for the MDC version. */
+.mat-mdc-slide-toggle.mat-checked:not(.mat-disabled) .mat-slide-toggle-bar {
   background-color: #3d5a67!important;
 }
-.mat-slide-toggle.mat-checked:not(.mat-disabled) .mat-slide-toggle-thumb {
+/* TODO(mdc-migration): The following rule targets internal classes of slide-toggle that may no longer apply for the MDC version. */
+.mat-mdc-slide-toggle.mat-checked:not(.mat-disabled) .mat-slide-toggle-thumb {
   background-color: #546e7a!important;
 }
 
-.mat-slide-toggle .mat-slide-toggle-thumb {
+/* TODO(mdc-migration): The following rule targets internal classes of slide-toggle that may no longer apply for the MDC version. */
+.mat-mdc-slide-toggle .mat-slide-toggle-thumb {
   background-color: var(--text-color)!important;
 }
-.mat-slide-toggle.mat-checked .mat-ripple-element {
+.mat-mdc-slide-toggle.mat-checked .mat-ripple-element {
   background-color: #546e7a!important;
 }
 
@@ -88,17 +92,20 @@ body {
 }
 
 //input outline color
+/* TODO(mdc-migration): The following rule targets internal classes of form-field that may no longer apply for the MDC version. */
 .mat-form-field-appearance-outline .mat-form-field-outline {
   color: var(--container-background-color) !important;
   // opacity: 1!important;
 }
 
 //mat-input focused color
+/* TODO(mdc-migration): The following rule targets internal classes of form-field that may no longer apply for the MDC version. */
 .mat-form-field-appearance-outline.mat-focused .mat-form-field-outline-thick {
   color: var(--text-color) !important;
 }
 
 // mat-input error outline color
+/* TODO(mdc-migration): The following rule targets internal classes of form-field that may no longer apply for the MDC version. */
 .mat-form-field-appearance-outline.mat-form-field-invalid.mat-form-field-invalid
   .mat-form-field-outline-thick {
   color: var(--text-color) !important;
@@ -106,42 +113,50 @@ body {
 }
 
 // mat-input carent color
-.mat-input-element {
+.mat-mdc-input-element {
   caret-color: var(--text-color) !important;
 }
 
 // mat-input error carent color
-.mat-form-field-invalid .mat-input-element,
+.mat-form-field-invalid .mat-mdc-input-element,
 .mat-warn .mat-input-element {
   caret-color: red !important;
 }
 
 // mat-label normal state style
+/* TODO(mdc-migration): The following rule targets internal classes of form-field that may no longer apply for the MDC version. */
 .mat-form-field-label {
   color: rgba(0, 0, 0, 0.6) !important;
   // color: $mainColor!important;
 }
 
 // mat-label focused style
-.mat-form-field.mat-focused .mat-form-field-label {
+/* TODO(mdc-migration): The following rule targets internal classes of form-field that may no longer apply for the MDC version. */
+.mat-mdc-form-field.mat-focused .mat-form-field-label {
   color: var(--text-color) !important;
 }
 
 // mat-label error style
-.mat-form-field.mat-form-field-invalid .mat-form-field-label {
+/* TODO(mdc-migration): The following rule targets internal classes of form-field that may no longer apply for the MDC version. */
+.mat-mdc-form-field.mat-form-field-invalid .mat-form-field-label {
   color: var(--text-color) !important;
 }
 
+/* TODO(mdc-migration): The following rule targets internal classes of select that may no longer apply for the MDC version. */
+/* TODO(mdc-migration): The following rule targets internal classes of select that may no longer apply for the MDC version. */
 .mat-select-arrow-wrapper {
+  /* TODO(mdc-migration): The following rule targets internal classes of select that may no longer apply for the MDC version. */
   .mat-select-arrow {
     color: var(--text-color);
   }
 }
 
+/* TODO(mdc-migration): The following rule targets internal classes of select that may no longer apply for the MDC version. */
 .mat-select-value {
   color: var(--text-color);
 }
 
+/* TODO(mdc-migration): The following rule targets internal classes of form-field that may no longer apply for the MDC version. */
 .mat-form-field-label {
   /*change color of label*/
   color: var(--text-color) !important;

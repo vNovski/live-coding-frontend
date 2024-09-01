@@ -34,7 +34,7 @@
     color: var(--text-color);
   }
 
-  tr:not(.mat-header-row):nth-child(odd) {
+  tr:not(.mat-mdc-header-row):nth-child(odd) {
     background-color:  rgba(#424251, 0.1);
   }
 }
