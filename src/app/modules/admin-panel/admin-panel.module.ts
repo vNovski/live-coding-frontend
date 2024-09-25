@@ -7,21 +7,15 @@ import { AdminPanelComponent } from './admin-panel.component';
 import { FormsModule } from '@angular/forms';
 import { FilterPipe } from 'src/app/shared/pipes/filter.pipe';
 import { SharedModule } from 'src/app/shared/shared.module';
-import { HttpClientModule } from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 
 
-@NgModule({
-  declarations: [
-    AdminPanelComponent,
-  ],
-  imports: [
-    CommonModule,
-    FormsModule,
-    AdminPanelRoutingModule,
-    MaterialModule,
-    SharedModule,
-    HttpClientModule
-  ],
-})
+@NgModule({ declarations: [
+        AdminPanelComponent,
+    ], imports: [CommonModule,
+        FormsModule,
+        AdminPanelRoutingModule,
+        MaterialModule,
+        SharedModule], providers: [provideHttpClient(withInterceptorsFromDi())] })
 export class AdminPanelModule { }
