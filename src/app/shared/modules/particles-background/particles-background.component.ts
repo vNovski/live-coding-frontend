@@ -105,9 +105,10 @@ interface IConnection {
 }
 
 @Component({
-  selector: 'app-particles-background',
-  templateUrl: './particles-background.component.html',
-  styleUrls: ['./particles-background.component.scss'],
+    selector: 'app-particles-background',
+    templateUrl: './particles-background.component.html',
+    styleUrls: ['./particles-background.component.scss'],
+    standalone: false
 })
 export class ParticlesBackgroundComponent implements OnInit, AfterViewInit {
   @Input('numberOfParticles') numberOfParticles: number = 100;

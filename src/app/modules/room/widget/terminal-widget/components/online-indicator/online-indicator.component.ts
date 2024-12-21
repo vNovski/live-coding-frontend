@@ -4,10 +4,11 @@ import { UserService } from 'src/app/modules/room/services/user/user.service';
 import { RoomService } from 'src/app/modules/room/room.service';
 
 @Component({
-  selector: 'app-online-indicator',
-  templateUrl: './online-indicator.component.html',
-  styleUrls: ['./online-indicator.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'app-online-indicator',
+    templateUrl: './online-indicator.component.html',
+    styleUrls: ['./online-indicator.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class OnlineIndicatorComponent implements OnInit {
   connections$ = this.roomService.connections$.pipe(

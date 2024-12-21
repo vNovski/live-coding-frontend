@@ -6,12 +6,13 @@ import { AboutUsDialogComponent } from '../about-us-dialog/about-us-dialog.compo
 import { fadeInOut } from 'src/app/core/animations/fade-in-out.animation';
 
 @Component({
-  selector: 'app-terminal-widget-header',
-  templateUrl: './header.component.html',
-  styleUrls: ['./header.component.scss'],
-  animations: [
-    fadeInOut(300, 200, false)
-  ]
+    selector: 'app-terminal-widget-header',
+    templateUrl: './header.component.html',
+    styleUrls: ['./header.component.scss'],
+    animations: [
+        fadeInOut(300, 200, false)
+    ],
+    standalone: false
 })
 export class HeaderComponent implements OnInit {
   @Input() isRunning: boolean = false;
@@ -28,7 +29,7 @@ export class HeaderComponent implements OnInit {
 
   ngOnInit(): void {}
 
- 
+
 
   onToggleFullScreen(): void {
     this.fullscreenStatus = !this.fullscreenStatus;

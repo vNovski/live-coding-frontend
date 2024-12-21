@@ -17,7 +17,8 @@ interface Screen {
 }
 
 @Directive({
-  selector: '[appMouseIndicators]',
+    selector: '[appMouseIndicators]',
+    standalone: false
 })
 export class MouseIndicatorsDirective implements AfterViewInit {
   @Input('appMouseIndicators') set mouse(mouse: any) {

@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 
 @Component({
-  selector: 'app-shortcuts-dialog',
-  templateUrl: './shortcuts-dialog.component.html',
-  styleUrls: ['./shortcuts-dialog.component.scss']
+    selector: 'app-shortcuts-dialog',
+    templateUrl: './shortcuts-dialog.component.html',
+    styleUrls: ['./shortcuts-dialog.component.scss'],
+    standalone: false
 })
 export class ShortcutsDialogComponent implements OnInit {
 

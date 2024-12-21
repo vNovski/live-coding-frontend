@@ -39,11 +39,12 @@ import { ITerminalLog } from 'src/app/shared/modules/terminal/interfaces/termina
 import { TerminalComponent } from 'src/app/shared/modules/terminal/terminal.component';
 
 @Component({
-  selector: 'app-terminal-widget',
-  templateUrl: './terminal-widget.component.html',
-  styleUrls: ['./terminal-widget.component.scss'],
-  providers: [TerminalWidgetService, LogService],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'app-terminal-widget',
+    templateUrl: './terminal-widget.component.html',
+    styleUrls: ['./terminal-widget.component.scss'],
+    providers: [TerminalWidgetService, LogService],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class TerminalWidgetComponent
   implements OnInit, AfterViewInit, OnDestroy

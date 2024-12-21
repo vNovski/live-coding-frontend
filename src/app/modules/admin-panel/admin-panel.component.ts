@@ -9,10 +9,11 @@ import { generateUsername } from 'src/app/core/utils/username-generator';
 import { environment } from 'src/environments/environment';
 
 @Component({
-  selector: 'app-admin-panel',
-  templateUrl: './admin-panel.component.html',
-  styleUrls: ['./admin-panel.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'app-admin-panel',
+    templateUrl: './admin-panel.component.html',
+    styleUrls: ['./admin-panel.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class AdminPanelComponent {
   search: string = '';

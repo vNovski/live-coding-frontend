@@ -43,19 +43,20 @@ declare var require: any;
 declare var CodeMirror: any;
 
 @Component({
-  selector: 'app-terminal',
-  templateUrl: './terminal.component.html',
-  providers: [
-    {
-      provide: NG_VALUE_ACCESSOR,
-      useExisting: forwardRef(() => TerminalComponent),
-      multi: true,
-    },
-    TerminalService,
-  ],
-  styleUrls: ['./terminal.component.scss'],
-  preserveWhitespaces: false,
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'app-terminal',
+    templateUrl: './terminal.component.html',
+    providers: [
+        {
+            provide: NG_VALUE_ACCESSOR,
+            useExisting: forwardRef(() => TerminalComponent),
+            multi: true,
+        },
+        TerminalService,
+    ],
+    styleUrls: ['./terminal.component.scss'],
+    preserveWhitespaces: false,
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class TerminalComponent
   implements AfterViewInit, OnDestroy, ControlValueAccessor, DoCheck

@@ -2,9 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 
 @Component({
-  selector: 'app-home',
-  templateUrl: './home.component.html',
-  styleUrls: ['./home.component.scss']
+    selector: 'app-home',
+    templateUrl: './home.component.html',
+    styleUrls: ['./home.component.scss'],
+    standalone: false
 })
 export class HomeComponent implements OnInit {
   constructor(private readonly router: Router) {
@@ -14,7 +15,7 @@ export class HomeComponent implements OnInit {
   }
 
   createRoom(): void {
-    const roomId = Math.random().toString(36).substring(2, 13); 
+    const roomId = Math.random().toString(36).substring(2, 13);
     this.router.navigate(['/room', roomId]);
   }
 

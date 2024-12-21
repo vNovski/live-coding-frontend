@@ -30,16 +30,17 @@ function roomServiceFactory(
 }
 
 @Component({
-  selector: 'app-room',
-  templateUrl: './room.component.html',
-  styleUrls: ['./room.component.scss'],
-  providers: [
-    {
-      provide: RoomService,
-      useFactory: roomServiceFactory,
-      deps: [ActivatedRoute, UserService, SocketService, SnackbarService],
-    },
-  ],
+    selector: 'app-room',
+    templateUrl: './room.component.html',
+    styleUrls: ['./room.component.scss'],
+    providers: [
+        {
+            provide: RoomService,
+            useFactory: roomServiceFactory,
+            deps: [ActivatedRoute, UserService, SocketService, SnackbarService],
+        },
+    ],
+    standalone: false
 })
 export class RoomComponent implements OnInit, OnDestroy {
   communicationEventTypes = CommunicationEventTypes;
